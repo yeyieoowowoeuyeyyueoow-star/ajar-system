@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { getPermit, deletePermit, getPermitPdfUrl, getPermitQrUrl } from '../../api/permits'
+import { getPermit, deletePermit, downloadPermitPdf, getPermitQrUrl } from '../../api/permits'
 import { Permit } from '../../types'
 import StatusBadge from '../../components/StatusBadge'
 import ConfirmDialog from '../../components/ConfirmDialog'
@@ -98,14 +98,12 @@ export default function PermitDetail() {
           <div className="card p-5">
             <h2 className="font-bold text-slate-800 mb-3">الإجراءات</h2>
             <div className="space-y-2">
-              <a
-                href={getPermitPdfUrl(permit.id)}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                onClick={() => downloadPermitPdf(permit.id, permit.permitNumber).catch(() => toast.error('فشل تحميل PDF'))}
                 className="btn-primary w-full justify-center"
               >
                 📥 تحميل PDF
-              </a>
+              </button>
               <Link to={`/permits/${permit.id}/edit`} className="btn-secondary w-full justify-center">
                 ✏️ تعديل
               </Link>
