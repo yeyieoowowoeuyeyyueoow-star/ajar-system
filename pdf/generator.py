@@ -44,12 +44,10 @@ LABEL_BG    = HexColor('#ECF0F1')   # label-cell background (same as section hea
 BORDER_COLOR = HexColor('#CECFD5')  # all cell/box borders (exact match to reference)
 BORDER_W    = 0.75
 
-# The reference template's real font ("Frutiger LT Arabic 45 Light") is
-# proprietary, so we substitute Noto Sans Arabic. Body copy uses the Light
-# (300) instance; section headers, labels, and the title use the Bold (700)
-# instance for visual emphasis matching the reference's heavier heading look.
-FONT_R = 'NotoSansArabicLight'
-FONT_B = 'NotoSansArabicBold'
+# Use Cairo (Google Fonts) — same font as the web UI — for visual consistency.
+# Regular weight for body copy, Bold for section headers, labels and title.
+FONT_R = 'CairoRegular'
+FONT_B = 'CairoBold'
 
 # Maps internal permit status values to the Arabic wording used on the
 # official Ajeer QR payload (matches the reference template: "ساري").
@@ -76,21 +74,21 @@ def _register() -> None:
     global _fonts_ok
     if _fonts_ok:
         return
-    light = os.path.join(FONTS_DIR, 'NotoSansArabic-Light-instanced.ttf')
-    bold  = os.path.join(FONTS_DIR, 'NotoSansArabic-Bold-instanced.ttf')
-    reg   = os.path.join(FONTS_DIR, 'Amiri-Regular.ttf')   # fallback only
-    r_src = light if (os.path.exists(light) and os.path.getsize(light) > 1000) else reg
-    b_src = bold if (os.path.exists(bold) and os.path.getsize(bold) > 1000) else r_src
-    if os.path.exists(r_src) and os.path.getsize(r_src) > 1000:
-        try:
-            pdfmetrics.registerFont(TTFont(FONT_R, r_src))
-        except Exception:
-            pass
-    if os.path.exists(b_src) and os.path.getsize(b_src) > 1000:
-        try:
-            pdfmetrics.registerFont(TTFont(FONT_B, b_src))
-        except Exception:
-            pass
+    cairo_r = os.path.join(FONTS_DIR, 'Cairo-Regular.ttf')
+    cairo_b = os.path.join(FONTS_DIR, 'Cairo-Bold.ttf')
+    fallback = os.path.join(FONTS_DIR, 'Amiri-Regular.ttf')
+
+    r_src = cairo_r if (os.path.exists(cairo_r) and os.path.getsize(cairo_r) > 10000) else fallback
+    b_src = cairo_b if (os.path.exists(cairo_b) and os.path.getsize(cairo_b) > 10000) else r_src
+
+    try:
+        pdfmetrics.registerFont(TTFont(FONT_R, r_src))
+    except Exception:
+        pass
+    try:
+        pdfmetrics.registerFont(TTFont(FONT_B, b_src))
+    except Exception:
+        pass
     _fonts_ok = True
 
 
