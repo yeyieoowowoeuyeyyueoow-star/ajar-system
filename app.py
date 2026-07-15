@@ -32,6 +32,14 @@ def create_app() -> Flask:
     app.register_blueprint(logs_bp,      url_prefix='/api/logs')
     app.register_blueprint(search_bp,    url_prefix='/api/search')
 
+    # ── Download project zip ──────────────────────────────────────────
+    @app.route('/download/ajar_source.zip')
+    def download_zip():
+        import pathlib
+        zip_path = pathlib.Path(__file__).parent / 'ajar_source.zip'
+        return send_from_directory(str(zip_path.parent), zip_path.name,
+                                   as_attachment=True)
+
     # ── Static frontend ───────────────────────────────────────────────
     @app.route('/assets/<path:filename>')
     def assets(filename):
