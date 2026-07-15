@@ -14,7 +14,7 @@ from .routes.logs     import logs_bp
 from .routes.search   import search_bp
 
 
-PUBLIC_DIR = os.path.join(os.path.dirname(__file__), '..', 'public')
+PUBLIC_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'public')
 
 
 def create_app() -> Flask:

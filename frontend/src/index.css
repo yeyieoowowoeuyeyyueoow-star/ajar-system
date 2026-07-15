@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    font-family: 'Cairo', 'Noto Sans Arabic', sans-serif;
+  }
+
+  body {
+    @apply bg-slate-50 text-slate-900;
+    direction: rtl;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-slate-100;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-slate-300 rounded-full;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-slate-400;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg font-semibold text-sm
+           hover:bg-primary-700 active:bg-primary-800 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center gap-2 px-4 py-2 bg-white text-slate-700 border border-slate-200 rounded-lg font-semibold text-sm
+           hover:bg-slate-50 active:bg-slate-100 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-danger {
+    @apply inline-flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg font-semibold text-sm
+           hover:bg-red-600 active:bg-red-700 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .card {
+    @apply bg-white rounded-xl border border-slate-200 shadow-sm;
+  }
+  .input {
+    @apply w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent
+           placeholder:text-slate-400 transition-all duration-150;
+  }
+  .label {
+    @apply block text-sm font-semibold text-slate-700 mb-1;
+  }
+  .table-row {
+    @apply border-b border-slate-100 hover:bg-slate-50 transition-colors duration-100;
+  }
+  .th {
+    @apply px-4 py-3 text-right text-xs font-bold text-slate-500 uppercase tracking-wide bg-slate-50;
+  }
+  .td {
+    @apply px-4 py-3 text-sm text-slate-700;
+  }
+}

@@ -11,9 +11,19 @@ def _safe(u: dict) -> dict:
     return {k: v for k, v in u.items() if k != 'password'}
 
 
+def require_admin():
+    """Return (user, None) for admin users, or (None, 403 response) for everyone else."""
+    user, err = require_auth()
+    if err:
+        return None, err
+    if user.get('role') != 'admin':
+        return None, (jsonify({'message': 'غير مصرح — هذه العملية تتطلب صلاحية مدير النظام'}), 403)
+    return user, None
+
+
 @users_bp.get('/')
 def list_users():
-    _, err = require_auth()
+    _, err = require_admin()
     if err: return err
     q      = (request.args.get('q') or '').lower()
     role   = request.args.get('role')
@@ -31,7 +41,7 @@ def list_users():
 
 @users_bp.post('/')
 def create_user():
-    user, err = require_auth()
+    user, err = require_admin()
     if err: return err
     body = request.get_json(silent=True) or {}
     if next((u for u in db.users if u['username'] == body.get('username')), None):
@@ -57,7 +67,7 @@ def create_user():
 
 @users_bp.get('/<uid>')
 def get_user(uid):
-    _, err = require_auth()
+    _, err = require_admin()
     if err: return err
     u = db.find_by_id(db.users, uid)
     if not u: return jsonify({'message': 'المستخدم غير موجود'}), 404
@@ -66,7 +76,7 @@ def get_user(uid):
 
 @users_bp.put('/<uid>')
 def update_user(uid):
-    user, err = require_auth()
+    user, err = require_admin()
     if err: return err
     u = db.find_by_id(db.users, uid)
     if not u: return jsonify({'message': 'المستخدم غير موجود'}), 404
@@ -84,7 +94,7 @@ def update_user(uid):
 
 @users_bp.delete('/<uid>')
 def delete_user(uid):
-    user, err = require_auth()
+    user, err = require_admin()
     if err: return err
     u = db.find_by_id(db.users, uid)
     if not u: return jsonify({'message': 'المستخدم غير موجود'}), 404
