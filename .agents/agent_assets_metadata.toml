@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "eccMpIhXLZ5rrwOA5SpWE"
+uri = "file://ajar_source.zip"
+type = "unspecified"
+title = "ajar_source.zip — كود المشروع كاملاً"
