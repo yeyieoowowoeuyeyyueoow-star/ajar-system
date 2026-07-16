@@ -6,3 +6,9 @@ id = "eccMpIhXLZ5rrwOA5SpWE"
 uri = "file://ajar_source.zip"
 type = "unspecified"
 title = "ajar_source.zip — كود المشروع كاملاً"
+
+[[outputs]]
+id = "XbWyZ_A37-vQcfbWa86Ew"
+uri = "file://ajar_project.zip"
+type = "unspecified"
+title = "ajar_project.zip"
