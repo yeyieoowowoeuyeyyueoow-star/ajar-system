@@ -4,11 +4,6 @@ import { useAuth } from '../contexts/AuthContext'
 import { login } from '../api/auth'
 import toast from 'react-hot-toast'
 
-const DEMO = [
-  { role: 'مدير النظام', u: 'admin',     p: 'admin123' },
-  { role: 'مشرف',        u: 'manager1',  p: 'manager123' },
-  { role: 'مشغّل',       u: 'operator1', p: 'operator123' },
-]
 
 export default function Login() {
   const navigate = useNavigate()
@@ -148,25 +143,6 @@ export default function Login() {
               </button>
             </form>
 
-            {/* Demo credentials */}
-            <div className="mt-6 pt-5 border-t border-slate-100">
-              <p className="text-xs font-bold text-slate-400 mb-3 uppercase tracking-wider">بيانات تجريبية</p>
-              <div className="grid grid-cols-3 gap-2">
-                {DEMO.map((x) => (
-                  <button
-                    key={x.u}
-                    onClick={() => setForm({ username: x.u, password: x.p })}
-                    className="flex flex-col items-center p-2.5 rounded-xl border border-slate-200 hover:border-primary-300 hover:bg-primary-50 transition-all duration-150 group"
-                  >
-                    <div className="w-8 h-8 rounded-lg bg-slate-100 group-hover:bg-primary-100 flex items-center justify-center text-slate-500 group-hover:text-primary-600 font-bold text-xs mb-1.5 transition-colors">
-                      {x.role[0]}
-                    </div>
-                    <p className="text-xs font-semibold text-slate-700">{x.role}</p>
-                    <p className="text-[10px] text-slate-400 font-mono mt-0.5">{x.u}</p>
-                  </button>
-                ))}
-              </div>
-            </div>
           </div>
         </div>
       </div>
