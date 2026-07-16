@@ -203,9 +203,9 @@ def _row4(c, lbl_r: str, val_r: str, lbl_l: str, val_l: str,
 
     cols = [
         (MARGIN,                            w_val_l, val_l, False, FONT_R),
-        (MARGIN + w_val_l,                  w_lbl_l, lbl_l, True,  FONT_B),
+        (MARGIN + w_val_l,                  w_lbl_l, lbl_l, True,  FONT_R),
         (MARGIN + w_val_l + w_lbl_l,        w_val_r, val_r, False, FONT_R),
-        (MARGIN + w_val_l + w_lbl_l + w_val_r, w_lbl_r, lbl_r, True, FONT_B),
+        (MARGIN + w_val_l + w_lbl_l + w_val_r, w_lbl_r, lbl_r, True, FONT_R),
     ]
 
     wrapped = [(_wrap(c, txt, cw - pad, fn, fs), cx, cw, is_lbl, fn)
@@ -234,7 +234,7 @@ def _row2(c, label: str, value: str, y_top: float,
     fs = 9
     pad = 6
 
-    lbl_lines = _wrap(c, label, lw - pad, FONT_B, fs)
+    lbl_lines = _wrap(c, label, lw - pad, FONT_R, fs)
     val_lines = _wrap(c, value, vw - pad, FONT_R, fs)
     n_lines = max(len(lbl_lines), len(val_lines), 1)
     line_h = 10.9
@@ -250,7 +250,7 @@ def _row2(c, label: str, value: str, y_top: float,
 
     lbl_top = rl_y + row_h - (row_h - len(lbl_lines) * line_h) / 2 - 8
     for i, line in enumerate(lbl_lines):
-        _text_center(c, line, MARGIN + vw + lw / 2, lbl_top - i * line_h, FONT_B, fs)
+        _text_center(c, line, MARGIN + vw + lw / 2, lbl_top - i * line_h, FONT_R, fs)
 
     return y_top + row_h
 
