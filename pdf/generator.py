@@ -74,14 +74,14 @@ def _register() -> None:
     global _fonts_ok
     if _fonts_ok:
         return
-    # Cairo-Static-* are full static instances generated from the variable font
-    # via fontTools.varLib.instancer — they carry complete Arabic glyph coverage.
-    cairo_r  = os.path.join(FONTS_DIR, 'Cairo-Static-Regular.ttf')
-    cairo_b  = os.path.join(FONTS_DIR, 'Cairo-Static-Bold.ttf')
+    # Cairo-Regular.ttf / Cairo-Bold.ttf are proper static instances (wght 400 / 700)
+    # downloaded directly from Google Fonts — distinct files with correct weight.
+    cairo_r  = os.path.join(FONTS_DIR, 'Cairo-Regular.ttf')
+    cairo_b  = os.path.join(FONTS_DIR, 'Cairo-Bold.ttf')
     fallback = os.path.join(FONTS_DIR, 'Amiri-Regular.ttf')
 
-    r_src = cairo_r  if (os.path.exists(cairo_r)  and os.path.getsize(cairo_r)  > 100_000) else fallback
-    b_src = cairo_b  if (os.path.exists(cairo_b)  and os.path.getsize(cairo_b)  > 100_000) else r_src
+    r_src = cairo_r if (os.path.exists(cairo_r) and os.path.getsize(cairo_r) > 50_000) else fallback
+    b_src = cairo_b if (os.path.exists(cairo_b) and os.path.getsize(cairo_b) > 50_000) else r_src
 
     try:
         pdfmetrics.registerFont(TTFont(FONT_R, r_src))
