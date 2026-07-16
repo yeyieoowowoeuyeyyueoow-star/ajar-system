@@ -286,13 +286,8 @@ def generate_permit_pdf(permit: dict) -> bytes:
     title_cell_w = CONTENT_W * 0.515
     logo_cell_w  = CONTENT_W - qr_cell_w - title_cell_w
 
-    # Outer border + internal column dividers (3-cell header row)
+    # Outer border only (no internal column dividers)
     _rect(c, MARGIN, rl_hdr, CONTENT_W, hdr_h, fill=white)
-    c.setLineWidth(BORDER_W)
-    c.setStrokeColor(BORDER_COLOR)
-    c.line(MARGIN + qr_cell_w, rl_hdr, MARGIN + qr_cell_w, rl_hdr + hdr_h)
-    c.line(MARGIN + qr_cell_w + title_cell_w, rl_hdr,
-           MARGIN + qr_cell_w + title_cell_w, rl_hdr + hdr_h)
 
     # QR code
     qr_sz = 43.25
