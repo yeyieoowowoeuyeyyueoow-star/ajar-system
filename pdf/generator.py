@@ -74,12 +74,14 @@ def _register() -> None:
     global _fonts_ok
     if _fonts_ok:
         return
-    cairo_r = os.path.join(FONTS_DIR, 'Cairo-Regular.ttf')
-    cairo_b = os.path.join(FONTS_DIR, 'Cairo-Bold.ttf')
+    # Cairo-Static-* are full static instances generated from the variable font
+    # via fontTools.varLib.instancer — they carry complete Arabic glyph coverage.
+    cairo_r  = os.path.join(FONTS_DIR, 'Cairo-Static-Regular.ttf')
+    cairo_b  = os.path.join(FONTS_DIR, 'Cairo-Static-Bold.ttf')
     fallback = os.path.join(FONTS_DIR, 'Amiri-Regular.ttf')
 
-    r_src = cairo_r if (os.path.exists(cairo_r) and os.path.getsize(cairo_r) > 10000) else fallback
-    b_src = cairo_b if (os.path.exists(cairo_b) and os.path.getsize(cairo_b) > 10000) else r_src
+    r_src = cairo_r  if (os.path.exists(cairo_r)  and os.path.getsize(cairo_r)  > 100_000) else fallback
+    b_src = cairo_b  if (os.path.exists(cairo_b)  and os.path.getsize(cairo_b)  > 100_000) else r_src
 
     try:
         pdfmetrics.registerFont(TTFont(FONT_R, r_src))
@@ -93,11 +95,39 @@ def _register() -> None:
 
 
 # ── Arabic helpers ────────────────────────────────────────────────────────────
+# Cairo font is missing 10 Arabic Presentation Forms (isolated letter forms).
+# We map each missing codepoint to its base Arabic equivalent — Cairo carries
+# all base Arabic letters (U+0600-06FF) and the shapes are visually identical.
+_CAIRO_MISSING_MAP = str.maketrans({
+    '\uFE83': '\u0623',  # ﺃ → أ  isolated alef + hamza above
+    '\uFE87': '\u0625',  # ﺇ → إ  isolated alef + hamza below
+    '\uFE8D': '\u0627',  # ﺍ → ا  isolated alef
+    '\uFE8F': '\u0628',  # ﺏ → ب  isolated ba
+    '\uFE93': '\u0629',  # ﺓ → ة  isolated ta marbuta
+    '\uFE95': '\u062A',  # ﺕ → ت  isolated ta
+    '\uFEA9': '\u062F',  # ﺩ → د  isolated dal
+    '\uFEAB': '\u0630',  # ﺫ → ذ  isolated thal
+    '\uFEAD': '\u0631',  # ﺭ → ر  isolated ra
+    '\uFEAF': '\u0632',  # ﺯ → ز  isolated zayn
+    '\uFEB9': '\u0635',  # ﺹ → ص  isolated sad
+    '\uFED1': '\u0641',  # ﻑ → ف  isolated fa
+    '\uFEDD': '\u0644',  # ﻝ → ل  isolated lam
+    '\uFEE1': '\u0645',  # ﻡ → م  isolated mim
+    '\uFEE5': '\u0646',  # ﻥ → ن  isolated nun
+    '\uFEE9': '\u0647',  # ﻩ → ه  isolated ha
+    '\uFEED': '\u0648',  # ﻭ → و  isolated waw
+    '\uFEEF': '\u0649',  # ﻯ → ى  isolated alef maqsura
+    '\uFEF1': '\u064A',  # ﻱ → ي  isolated ya
+})
+
+
 def ar(text: str) -> str:
-    """Reshape + bidi-flip Arabic text so ReportLab renders it correctly."""
+    """Reshape + bidi-flip Arabic text so ReportLab renders it correctly.
+    Also patches the 10 isolated-form codepoints absent from Cairo's cmap."""
     if not text:
         return ''
-    return get_display(arabic_reshaper.reshape(str(text)))
+    shaped = get_display(arabic_reshaper.reshape(str(text)))
+    return shaped.translate(_CAIRO_MISSING_MAP)
 
 
 def _wrap(c: rl_canvas.Canvas, text: str, max_w: float,
