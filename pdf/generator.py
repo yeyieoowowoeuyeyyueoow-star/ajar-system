@@ -383,7 +383,7 @@ def generate_permit_pdf(permit: dict) -> bytes:
     lh = 13.5
     for i, line in enumerate(lines):
         rl_y = _rl(y) - (i + 1) * lh
-        c.drawCentredString(MARGIN + CONTENT_W / 2, rl_y, ar(line))
+        c.drawRightString(MARGIN + CONTENT_W, rl_y, ar(line))
     y += len(lines) * lh + 19
 
     # ═════════════════════════════════════════════════════════════════════════
