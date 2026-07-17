@@ -1,5 +1,6 @@
 """Web UI routes — renders Jinja2 templates."""
 import uuid
+import json
 from functools import wraps
 from flask import (Blueprint, render_template, request, redirect,
                    url_for, session, flash)
@@ -101,7 +102,9 @@ def permits_new():
     workers = db.list_workers(limit=1000)['data']
     companies = db.list_companies(limit=1000)['data']
     return render_template('permits/form.html', permit=None, workers=workers,
-                           companies=companies, user=current_user(), status_ar=STATUS_AR)
+                           companies=companies, user=current_user(), status_ar=STATUS_AR,
+                           workers_json=json.dumps(workers, ensure_ascii=False, default=str),
+                           companies_json=json.dumps(companies, ensure_ascii=False, default=str))
 
 
 @web_bp.post('/permits/new')
@@ -148,7 +151,9 @@ def permits_edit(pid):
     workers = db.list_workers(limit=1000)['data']
     companies = db.list_companies(limit=1000)['data']
     return render_template('permits/form.html', permit=p, workers=workers,
-                           companies=companies, user=current_user(), status_ar=STATUS_AR)
+                           companies=companies, user=current_user(), status_ar=STATUS_AR,
+                           workers_json=json.dumps(workers, ensure_ascii=False, default=str),
+                           companies_json=json.dumps(companies, ensure_ascii=False, default=str))
 
 
 @web_bp.post('/permits/<pid>/edit')
