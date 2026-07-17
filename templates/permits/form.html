@@ -4,9 +4,10 @@
 
 {% block content %}
 <form method="POST" action="{{ url_for('web.permits_update', pid=permit.id) if permit else url_for('web.permits_create') }}">
+  <input type="hidden" name="worker_mode" id="worker_mode" value="{{ 'existing' if permit else 'existing' }}"/>
   <div class="row g-3">
 
-    {# ── قسم 1: بيانات التصريح الأساسية ── #}
+    {# ══ قسم 1: بيانات التصريح ══ #}
     <div class="col-12">
       <div class="card">
         <div class="card-header px-4 py-3">
@@ -24,7 +25,7 @@
               <label class="form-label fw-600">الحالة</label>
               <select name="status" class="form-select">
                 {% for val, label in [('pending','قيد الانتظار'),('active','ساري'),('expired','منتهي'),('rejected','مرفوض'),('suspended','موقوف')] %}
-                <option value="{{ val }}" {{ 'selected' if permit and permit.status == val else ('selected' if not permit and val == 'pending') }}>{{ label }}</option>
+                <option value="{{ val }}" {{ 'selected' if (permit and permit.status == val) or (not permit and val == 'pending') }}>{{ label }}</option>
                 {% endfor %}
               </select>
             </div>
@@ -44,7 +45,7 @@
                      value="{{ permit.expiryDate if permit else '' }}"/>
             </div>
             <div class="col-sm-6">
-              <label class="form-label fw-600">المهنة</label>
+              <label class="form-label fw-600">المهنة في التصريح</label>
               <input type="text" name="occupation" id="field_occupation" class="form-control"
                      value="{{ permit.occupation if permit else '' }}" placeholder="مثال: عامل بناء"/>
             </div>
@@ -56,94 +57,110 @@
             <div class="col-12">
               <label class="form-label fw-600">ملاحظات / نبذة عن التعاقد</label>
               <textarea name="notes" class="form-control" rows="2"
-                        placeholder="وصف طبيعة العمل أو أي ملاحظات إضافية...">{{ permit.notes if permit else '' }}</textarea>
+                        placeholder="وصف طبيعة العمل أو أي ملاحظات...">{{ permit.notes if permit else '' }}</textarea>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    {# ── قسم 2: بيانات العامل ── #}
+    {# ══ قسم 2: بيانات العامل ══ #}
     <div class="col-12">
       <div class="card">
-        <div class="card-header px-4 py-3 d-flex align-items-center justify-content-between">
+        <div class="card-header px-4 py-3 d-flex align-items-center justify-content-between flex-wrap gap-2">
           <span><i class="bi bi-person text-primary me-2"></i>بيانات العامل</span>
-          <small class="text-muted">اختر العامل لتعبئة بياناته تلقائياً</small>
+          {# تبديل بين عامل مسجّل وعامل جديد #}
+          <div class="btn-group btn-group-sm" role="group">
+            <input type="radio" class="btn-check" name="worker_mode_radio" id="mode_existing" value="existing" autocomplete="off" checked>
+            <label class="btn btn-outline-primary" for="mode_existing">
+              <i class="bi bi-search me-1"></i>عامل مسجّل
+            </label>
+            <input type="radio" class="btn-check" name="worker_mode_radio" id="mode_new" value="new" autocomplete="off">
+            <label class="btn btn-outline-success" for="mode_new">
+              <i class="bi bi-person-plus me-1"></i>عامل جديد
+            </label>
+          </div>
         </div>
         <div class="card-body px-4 py-4">
-          <div class="row g-3">
-            <div class="col-12">
-              <label class="form-label fw-600">العامل <span class="text-danger">*</span></label>
-              <select name="workerId" id="workerSelect" class="form-select" required>
-                <option value="">-- اختر العامل --</option>
-                {% for w in workers %}
-                <option value="{{ w.id }}" {{ 'selected' if permit and permit.workerId == w.id }}>
-                  {{ w.fullName }}{% if w.idNumber %} — {{ w.idNumber }}{% endif %}{% if w.nationality %} ({{ w.nationality }}){% endif %}
-                </option>
-                {% endfor %}
-              </select>
-            </div>
 
-            {# حقول تعبأ تلقائياً من بيانات العامل #}
+          {# ── اختيار عامل مسجّل ── #}
+          <div id="section_existing">
+            <div class="row g-1 mb-3">
+              <div class="col-12">
+                <label class="form-label fw-600">اختر من قائمة العمال <span class="text-danger">*</span></label>
+                <select name="workerId" id="workerSelect" class="form-select">
+                  <option value="">-- اختر العامل --</option>
+                  {% for w in workers %}
+                  <option value="{{ w.id }}" {{ 'selected' if permit and permit.workerId == w.id }}>
+                    {{ w.fullName }}{% if w.idNumber %} — {{ w.idNumber }}{% endif %}{% if w.nationality %} ({{ w.nationality }}){% endif %}
+                  </option>
+                  {% endfor %}
+                </select>
+                <div class="form-text text-muted">بعد الاختيار ستظهر بيانات العامل أدناه ويمكنك تعديلها</div>
+              </div>
+            </div>
+          </div>
+
+          {# ── حقول بيانات العامل (مشتركة بين الوضعين، قابلة للتعديل) ── #}
+          <div class="row g-3">
             <div class="col-sm-6">
-              <label class="form-label fw-600">الاسم الكامل</label>
-              <input type="text" id="field_workerName" class="form-control bg-light" readonly
+              <label class="form-label fw-600">الاسم الكامل <span class="text-danger">*</span></label>
+              <input type="text" name="worker_fullName" id="field_workerName" class="form-control"
                      value="{{ permit.worker.fullName if permit and permit.worker else '' }}"
-                     placeholder="يُعبأ تلقائياً عند اختيار العامل"/>
+                     placeholder="الاسم الرباعي"/>
             </div>
             <div class="col-sm-6">
               <label class="form-label fw-600">الجنسية</label>
-              <input type="text" id="field_nationality" class="form-control bg-light" readonly
+              <input type="text" name="worker_nationality" id="field_nationality" class="form-control"
                      value="{{ permit.worker.nationality if permit and permit.worker else '' }}"
-                     placeholder="يُعبأ تلقائياً"/>
+                     placeholder="مثال: يمني، سوداني"/>
             </div>
             <div class="col-sm-6">
               <label class="form-label fw-600">رقم الهوية / الإقامة</label>
-              <input type="text" id="field_idNumber" class="form-control bg-light" readonly
+              <input type="text" name="worker_idNumber" id="field_idNumber" class="form-control"
                      value="{{ permit.worker.idNumber if permit and permit.worker else '' }}"
-                     placeholder="يُعبأ تلقائياً"/>
+                     placeholder="رقم الهوية أو الإقامة"/>
             </div>
             <div class="col-sm-6">
               <label class="form-label fw-600">رقم جواز السفر</label>
-              <input type="text" id="field_passportNumber" class="form-control bg-light" readonly
+              <input type="text" name="worker_passportNumber" id="field_passportNumber" class="form-control"
                      value="{{ permit.worker.passportNumber if permit and permit.worker else '' }}"
-                     placeholder="يُعبأ تلقائياً"/>
+                     placeholder="رقم الجواز"/>
             </div>
             <div class="col-sm-6">
               <label class="form-label fw-600">رقم الجوال</label>
-              <input type="text" id="field_phone" class="form-control bg-light" readonly
+              <input type="text" name="worker_phone" id="field_phone" class="form-control"
                      value="{{ permit.worker.phone if permit and permit.worker else '' }}"
-                     placeholder="يُعبأ تلقائياً"/>
+                     placeholder="05xxxxxxxx"/>
             </div>
             <div class="col-sm-6">
               <label class="form-label fw-600">تاريخ الميلاد</label>
-              <input type="text" id="field_birthDate" class="form-control bg-light" readonly
-                     value="{{ permit.worker.birthDate if permit and permit.worker else '' }}"
-                     placeholder="يُعبأ تلقائياً"/>
+              <input type="date" name="worker_birthDate" id="field_birthDate" class="form-control"
+                     value="{{ permit.worker.birthDate if permit and permit.worker else '' }}"/>
             </div>
             <div class="col-sm-6">
               <label class="form-label fw-600">البريد الإلكتروني</label>
-              <input type="text" id="field_email" class="form-control bg-light" readonly
+              <input type="email" name="worker_email" id="field_email" class="form-control"
                      value="{{ permit.worker.email if permit and permit.worker else '' }}"
-                     placeholder="يُعبأ تلقائياً"/>
+                     placeholder="example@email.com"/>
             </div>
             <div class="col-sm-6">
               <label class="form-label fw-600">المهنة المسجّلة للعامل</label>
-              <input type="text" id="field_workerOccupation" class="form-control bg-light" readonly
+              <input type="text" name="worker_occupation" id="field_workerOccupation" class="form-control"
                      value="{{ permit.worker.occupation if permit and permit.worker else '' }}"
-                     placeholder="يُعبأ تلقائياً"/>
+                     placeholder="المهنة في سجل العامل"/>
             </div>
           </div>
+
         </div>
       </div>
     </div>
 
-    {# ── قسم 3: بيانات الشركات ── #}
+    {# ══ قسم 3: بيانات الشركات ══ #}
     <div class="col-md-6">
       <div class="card h-100">
         <div class="card-header px-4 py-3 d-flex align-items-center justify-content-between">
           <span><i class="bi bi-building text-info me-2"></i>الشركة المقدِّمة للخدمة</span>
-          <small class="text-muted">تعبأ تلقائياً</small>
         </div>
         <div class="card-body px-4 py-4">
           <div class="row g-3">
@@ -162,13 +179,13 @@
                      value="{{ permit.providerCompany.companyNumber if permit and permit.providerCompany else '' }}"
                      placeholder="يُعبأ تلقائياً"/>
             </div>
-            <div class="col-12">
+            <div class="col-sm-6">
               <label class="form-label fw-600">المدينة</label>
               <input type="text" id="field_providerCity" class="form-control bg-light" readonly
                      value="{{ permit.providerCompany.city if permit and permit.providerCompany else '' }}"
                      placeholder="يُعبأ تلقائياً"/>
             </div>
-            <div class="col-12">
+            <div class="col-sm-6">
               <label class="form-label fw-600">رقم التواصل</label>
               <input type="text" id="field_providerPhone" class="form-control bg-light" readonly
                      value="{{ permit.providerCompany.phone if permit and permit.providerCompany else '' }}"
@@ -183,7 +200,6 @@
       <div class="card h-100">
         <div class="card-header px-4 py-3 d-flex align-items-center justify-content-between">
           <span><i class="bi bi-building-check text-success me-2"></i>الشركة المستفيدة من الخدمة</span>
-          <small class="text-muted">تعبأ تلقائياً</small>
         </div>
         <div class="card-body px-4 py-4">
           <div class="row g-3">
@@ -202,13 +218,13 @@
                      value="{{ permit.beneficiaryCompany.companyNumber if permit and permit.beneficiaryCompany else '' }}"
                      placeholder="يُعبأ تلقائياً"/>
             </div>
-            <div class="col-12">
+            <div class="col-sm-6">
               <label class="form-label fw-600">المدينة</label>
               <input type="text" id="field_beneficiaryCity" class="form-control bg-light" readonly
                      value="{{ permit.beneficiaryCompany.city if permit and permit.beneficiaryCompany else '' }}"
                      placeholder="يُعبأ تلقائياً"/>
             </div>
-            <div class="col-12">
+            <div class="col-sm-6">
               <label class="form-label fw-600">رقم التواصل</label>
               <input type="text" id="field_beneficiaryPhone" class="form-control bg-light" readonly
                      value="{{ permit.beneficiaryCompany.phone if permit and permit.beneficiaryCompany else '' }}"
@@ -219,7 +235,7 @@
       </div>
     </div>
 
-    {# ── أزرار الحفظ ── #}
+    {# ══ أزرار الحفظ ══ #}
     <div class="col-12">
       <div class="d-flex gap-2">
         <button type="submit" class="btn btn-primary px-4">
@@ -229,29 +245,57 @@
       </div>
     </div>
 
-  </div>{# end row #}
+  </div>
 </form>
 
-{# ── بيانات العمال والشركات للـ JavaScript ── #}
+{# بيانات JSON للـ JavaScript #}
 <script>
-const WORKERS = {{ workers_json | safe }};
+const WORKERS   = {{ workers_json   | safe }};
 const COMPANIES = {{ companies_json | safe }};
 
-function fillWorker(id) {
-  const w = WORKERS.find(x => x.id === id) || {};
-  document.getElementById('field_workerName').value       = w.fullName       || '';
-  document.getElementById('field_nationality').value      = w.nationality    || '';
-  document.getElementById('field_idNumber').value         = w.idNumber       || '';
-  document.getElementById('field_passportNumber').value   = w.passportNumber || '';
-  document.getElementById('field_phone').value            = w.phone          || '';
-  document.getElementById('field_birthDate').value        = w.birthDate      || '';
-  document.getElementById('field_email').value            = w.email          || '';
-  document.getElementById('field_workerOccupation').value = w.occupation     || '';
-  // اقتراح المهنة تلقائياً إن كان حقل المهنة فارغاً
-  const occField = document.getElementById('field_occupation');
-  if (!occField.value) occField.value = w.occupation || '';
+const workerModeInput = document.getElementById('worker_mode');
+const workerSelect    = document.getElementById('workerSelect');
+const sectionExisting = document.getElementById('section_existing');
+
+// ── تبديل الوضع ──
+document.querySelectorAll('input[name="worker_mode_radio"]').forEach(radio => {
+  radio.addEventListener('change', function () {
+    const isNew = this.value === 'new';
+    workerModeInput.value = this.value;
+    sectionExisting.style.display = isNew ? 'none' : '';
+    workerSelect.required = !isNew;
+    if (isNew) {
+      // مسح الحقول للإدخال الحر
+      clearWorkerFields();
+      workerSelect.value = '';
+    }
+  });
+});
+
+function clearWorkerFields() {
+  ['field_workerName','field_nationality','field_idNumber','field_passportNumber',
+   'field_phone','field_birthDate','field_email','field_workerOccupation'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
 }
 
+// ── تعبئة بيانات عامل مسجّل ──
+function fillWorker(id) {
+  const w = WORKERS.find(x => x.id === id) || {};
+  document.getElementById('field_workerName').value         = w.fullName       || '';
+  document.getElementById('field_nationality').value        = w.nationality    || '';
+  document.getElementById('field_idNumber').value           = w.idNumber       || '';
+  document.getElementById('field_passportNumber').value     = w.passportNumber || '';
+  document.getElementById('field_phone').value              = w.phone          || '';
+  document.getElementById('field_birthDate').value          = w.birthDate      || '';
+  document.getElementById('field_email').value              = w.email          || '';
+  document.getElementById('field_workerOccupation').value   = w.occupation     || '';
+  // اقتراح المهنة في التصريح إن كانت فارغة
+  const occ = document.getElementById('field_occupation');
+  if (!occ.value) occ.value = w.occupation || '';
+}
+
+// ── تعبئة بيانات شركة ──
 function fillCompany(id, prefix) {
   const c = COMPANIES.find(x => x.id === id) || {};
   document.getElementById(`field_${prefix}Number`).value = c.companyNumber || '';
@@ -259,19 +303,20 @@ function fillCompany(id, prefix) {
   document.getElementById(`field_${prefix}Phone`).value  = c.phone         || '';
 }
 
-document.getElementById('workerSelect').addEventListener('change', function() {
-  fillWorker(this.value);
+workerSelect.addEventListener('change', function () {
+  if (this.value) fillWorker(this.value);
+  else clearWorkerFields();
 });
-document.getElementById('providerSelect').addEventListener('change', function() {
+document.getElementById('providerSelect').addEventListener('change', function () {
   fillCompany(this.value, 'provider');
 });
-document.getElementById('beneficiarySelect').addEventListener('change', function() {
+document.getElementById('beneficiarySelect').addEventListener('change', function () {
   fillCompany(this.value, 'beneficiary');
 });
 
-// تعبئة عند التحميل إن كانت قيم محددة مسبقاً (صفحة التعديل)
-(function() {
-  const wv = document.getElementById('workerSelect').value;
+// ── تعبئة أولية عند التحميل (صفحة التعديل) ──
+(function () {
+  const wv = workerSelect.value;
   if (wv) fillWorker(wv);
   const pv = document.getElementById('providerSelect').value;
   if (pv) fillCompany(pv, 'provider');

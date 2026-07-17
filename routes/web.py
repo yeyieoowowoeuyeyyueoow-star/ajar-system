@@ -112,18 +112,41 @@ def permits_new():
 def permits_create():
     f = request.form
     u = current_user()
+    worker_mode = f.get('worker_mode', 'existing')
+    worker_id = f.get('workerId') or None
+
+    # بيانات العامل المُدخَلة في النموذج
+    worker_fields = {
+        'fullName':       f.get('worker_fullName', '').strip(),
+        'nationality':    f.get('worker_nationality', '').strip(),
+        'idNumber':       f.get('worker_idNumber', '').strip(),
+        'passportNumber': f.get('worker_passportNumber', '').strip(),
+        'phone':          f.get('worker_phone', '').strip(),
+        'birthDate':      f.get('worker_birthDate', '').strip(),
+        'email':          f.get('worker_email', '').strip(),
+        'occupation':     f.get('worker_occupation', '').strip(),
+    }
+
+    if worker_mode == 'new':
+        # إنشاء عامل جديد من البيانات المُدخَلة
+        new_worker = db.create_worker(worker_fields, u['id'])
+        worker_id = new_worker['id']
+    elif worker_id and any(worker_fields.values()):
+        # تحديث بيانات العامل المسجّل بما عدّله المستخدم
+        db.update_worker(worker_id, worker_fields, u['id'])
+
     data = {
-        'permitNumber': f.get('permitNumber') or None,
-        'workerId': f.get('workerId') or None,
-        'companyId': f.get('companyId') or None,
+        'permitNumber':         f.get('permitNumber') or None,
+        'workerId':             worker_id,
+        'companyId':            f.get('companyId') or None,
         'beneficiaryCompanyId': f.get('beneficiaryCompanyId') or None,
-        'occupation': f.get('occupation', ''),
-        'notes': f.get('notes', ''),
-        'workLocation': f.get('workLocation', ''),
-        'status': f.get('status', 'pending'),
-        'startDate': f.get('startDate', ''),
-        'expiryDate': f.get('expiryDate', ''),
-        'issueDate': f.get('issueDate', ''),
+        'occupation':           f.get('occupation', ''),
+        'notes':                f.get('notes', ''),
+        'workLocation':         f.get('workLocation', ''),
+        'status':               f.get('status', 'pending'),
+        'startDate':            f.get('startDate', ''),
+        'expiryDate':           f.get('expiryDate', ''),
+        'issueDate':            f.get('issueDate', ''),
     }
     db.create_permit(data, u['id'])
     flash('تم إنشاء التصريح بنجاح', 'success')
@@ -161,18 +184,38 @@ def permits_edit(pid):
 def permits_update(pid):
     f = request.form
     u = current_user()
+    worker_mode = f.get('worker_mode', 'existing')
+    worker_id   = f.get('workerId') or None
+
+    worker_fields = {
+        'fullName':       f.get('worker_fullName', '').strip(),
+        'nationality':    f.get('worker_nationality', '').strip(),
+        'idNumber':       f.get('worker_idNumber', '').strip(),
+        'passportNumber': f.get('worker_passportNumber', '').strip(),
+        'phone':          f.get('worker_phone', '').strip(),
+        'birthDate':      f.get('worker_birthDate', '').strip(),
+        'email':          f.get('worker_email', '').strip(),
+        'occupation':     f.get('worker_occupation', '').strip(),
+    }
+
+    if worker_mode == 'new':
+        new_worker = db.create_worker(worker_fields, u['id'])
+        worker_id  = new_worker['id']
+    elif worker_id and any(worker_fields.values()):
+        db.update_worker(worker_id, worker_fields, u['id'])
+
     data = {
-        'permitNumber': f.get('permitNumber') or None,
-        'workerId': f.get('workerId') or None,
-        'companyId': f.get('companyId') or None,
+        'permitNumber':         f.get('permitNumber') or None,
+        'workerId':             worker_id,
+        'companyId':            f.get('companyId') or None,
         'beneficiaryCompanyId': f.get('beneficiaryCompanyId') or None,
-        'occupation': f.get('occupation'),
-        'notes': f.get('notes'),
-        'workLocation': f.get('workLocation'),
-        'status': f.get('status'),
-        'startDate': f.get('startDate'),
-        'expiryDate': f.get('expiryDate'),
-        'issueDate': f.get('issueDate'),
+        'occupation':           f.get('occupation'),
+        'notes':                f.get('notes'),
+        'workLocation':         f.get('workLocation'),
+        'status':               f.get('status'),
+        'startDate':            f.get('startDate'),
+        'expiryDate':           f.get('expiryDate'),
+        'issueDate':            f.get('issueDate'),
     }
     db.update_permit(pid, data, u['id'])
     flash('تم تحديث التصريح بنجاح', 'success')
