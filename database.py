@@ -13,9 +13,16 @@ _pool = None
 def _get_pool():
     global _pool
     if _pool is None:
+        url = os.environ.get('DATABASE_URL')
+        if not url:
+            raise RuntimeError(
+                "DATABASE_URL غير موجود. "
+                "في Railway: افتح المشروع ← + New ← Database ← Add PostgreSQL، "
+                "ثم تأكد أن الخدمتين في نفس المشروع حتى يُحقن المتغير تلقائياً."
+            )
         _pool = psycopg2.pool.ThreadedConnectionPool(
             1, 10,
-            dsn=os.environ['DATABASE_URL'],
+            dsn=url,
             cursor_factory=psycopg2.extras.RealDictCursor,
         )
     return _pool
