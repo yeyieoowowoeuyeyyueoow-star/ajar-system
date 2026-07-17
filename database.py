@@ -564,10 +564,6 @@ def list_permits(q=None, status=None, company_id=None, worker_id=None, page=1, l
     return paginate(rows, page, limit)
 
 def get_permit(pid: str) -> dict | None:
-    sql, _ = _permit_query("WHERE p.id = %s", [])
-    with db_ctx() as (conn, cur):
-        cur.execute(sql.replace(_permit_query()[0], ''), (pid,))
-        # Re-run properly
     sql2 = f"""
         SELECT p.*,
             w.full_name AS w_full_name, w.id_number AS w_id_number,
