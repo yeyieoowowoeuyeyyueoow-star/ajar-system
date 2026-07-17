@@ -393,14 +393,6 @@ def generate_permit_pdf(permit: dict) -> bytes:
               lbl_r='رقم الهوية / الإقامة', val_r=worker.get('idNumber', ''),
               lbl_l='الجنسية',              val_l=worker.get('nationality', ''),
               y_top=y)
-    y = _row4(c,
-              lbl_r='رقم جواز السفر',       val_r=worker.get('passportNumber', ''),
-              lbl_l='رقم الجوال',           val_l=worker.get('phone', ''),
-              y_top=y)
-    y = _row4(c,
-              lbl_r='تاريخ الميلاد',        val_r=str(worker.get('birthDate', '') or ''),
-              lbl_l='البريد الإلكتروني',    val_l=worker.get('email', ''),
-              y_top=y)
 
     # ═════════════════════════════════════════════════════════════════════════
     # 4 ▸ SERVICE PROVIDER
@@ -412,15 +404,6 @@ def generate_permit_pdf(permit: dict) -> bytes:
               lbl_l='رقم المنشأة في وزارة الموارد البشرية والتنمية الاجتماعية',
               val_l=provider.get('companyNumber', ''),
               y_top=y)
-    y = _row4(c,
-              lbl_r='المدينة',   val_r=provider.get('city', ''),
-              lbl_l='رقم الهاتف', val_l=provider.get('phone', ''),
-              y_top=y)
-    if provider.get('email') or provider.get('address'):
-        y = _row4(c,
-                  lbl_r='البريد الإلكتروني', val_r=provider.get('email', ''),
-                  lbl_l='العنوان',           val_l=provider.get('address', ''),
-                  y_top=y)
 
     # ═════════════════════════════════════════════════════════════════════════
     # 5 ▸ BENEFICIARY
@@ -432,44 +415,23 @@ def generate_permit_pdf(permit: dict) -> bytes:
               lbl_l='رقم المنشأة في وزارة الموارد البشرية والتنمية الاجتماعية',
               val_l=beneficiary.get('companyNumber', ''),
               y_top=y)
-    y = _row4(c,
-              lbl_r='المدينة',    val_r=beneficiary.get('city', ''),
-              lbl_l='رقم الهاتف', val_l=beneficiary.get('phone', ''),
-              y_top=y)
-    if beneficiary.get('email') or beneficiary.get('address'):
-        y = _row4(c,
-                  lbl_r='البريد الإلكتروني', val_r=beneficiary.get('email', ''),
-                  lbl_l='العنوان',           val_l=beneficiary.get('address', ''),
-                  y_top=y)
 
     # ═════════════════════════════════════════════════════════════════════════
     # 6 ▸ PERMIT DATA
     # ═════════════════════════════════════════════════════════════════════════
-    STATUS_AR = {
-        'active': 'ساري', 'pending': 'قيد الانتظار',
-        'expired': 'منتهي', 'rejected': 'مرفوض', 'suspended': 'موقوف',
-    }
     y = _section_header(c, 'بيانات التصريح', y)
 
-    # رقم التصريح والحالة
-    y = _row4(c,
-              lbl_r='رقم التصريح', val_r=permit.get('permitNumber', ''),
-              lbl_l='الحالة',      val_l=STATUS_AR.get(permit.get('status', ''), permit.get('status', '')),
-              y_top=y)
-
-    # تواريخ الإصدار والبداية والنهاية (3 حقول في صفين)
-    y = _row4(c,
-              lbl_r='تاريخ الإصدار',        val_r=str(permit.get('issueDate', '') or ''),
-              lbl_l='تاريخ بداية التصريح',  val_l=str(permit.get('startDate', '') or ''),
-              y_top=y)
-    y = _row2(c, 'تاريخ نهاية التصريح',
-              str(permit.get('expiryDate', '') or ''), y, lbl_ratio=0.25)
-
-    # نبذة عن التعاقد
+    # Row: نبذة عن التعاقد  (2-col, label on right)
     y = _row2(c, 'نبذة عن التعاقد',
               permit.get('notes') or permit.get('occupation', ''), y, lbl_ratio=0.25)
 
-    # مواقع العمل
+    # Row: dates (4-col)
+    y = _row4(c,
+              lbl_r='تاريخ بداية التصريح', val_r=permit.get('startDate', ''),
+              lbl_l='تاريخ نهاية التصريح', val_l=permit.get('expiryDate', ''),
+              y_top=y)
+
+    # Row: work location (2-col, label on right)
     y = _row2(c, 'مواقع العمل', permit.get('workLocation', ''), y, lbl_ratio=0.25)
     y += 4.9
 
