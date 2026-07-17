@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.env
+.venv
+venv/
+*.egg-info/
+
+# React/Vite scaffold (not used — Flask only)
+node_modules/
+dist/
+src/
+index.html
+vite.config.ts
+tsconfig.json
+components.json
+package.json
+package-lock.json
+
+# Replit internals
+.replit-artifact/
+.pythonlibs/
+
+# OS
+.DS_Store
