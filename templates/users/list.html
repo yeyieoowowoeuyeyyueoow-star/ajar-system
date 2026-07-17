@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}المستخدمون{% endblock %}
+{% block page_title %}إدارة المستخدمين{% endblock %}
+{% block topbar_actions %}
+<a href="{{ url_for('web.users_new') }}" class="btn btn-sm btn-primary">
+  <i class="bi bi-plus-lg me-1"></i>إضافة مستخدم
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr>
+          <th>الاسم</th>
+          <th>اسم المستخدم</th>
+          <th>البريد الإلكتروني</th>
+          <th>الدور</th>
+          <th>الحالة</th>
+          <th>إجراءات</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in users %}
+        <tr>
+          <td class="fw-600">{{ u.fullName }}</td>
+          <td><code>{{ u.username }}</code></td>
+          <td>{{ u.email or '-' }}</td>
+          <td><span class="badge bg-primary bg-opacity-10 text-primary">{{ role_ar.get(u.role, u.role) }}</span></td>
+          <td><span class="status-badge badge-{{ u.status }}">{{ status_ar.get(u.status, u.status) }}</span></td>
+          <td>
+            <div class="d-flex gap-1">
+              <a href="{{ url_for('web.users_edit', uid=u.id) }}" class="btn btn-sm btn-outline-primary" title="تعديل"><i class="bi bi-pencil"></i></a>
+              {% if u.id != user.id %}
+              <form method="POST" action="{{ url_for('web.users_delete', uid=u.id) }}" onsubmit="return confirm('هل تريد حذف هذا المستخدم؟')">
+                <button class="btn btn-sm btn-outline-danger" title="حذف"><i class="bi bi-trash"></i></button>
+              </form>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6"><div class="empty-state"><i class="bi bi-people-slash"></i>لا يوجد مستخدمون</div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

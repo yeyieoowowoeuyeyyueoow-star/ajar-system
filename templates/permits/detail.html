@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% block title %}{{ permit.permitNumber }}{% endblock %}
+{% block page_title %}تفاصيل التصريح{% endblock %}
+{% block topbar_actions %}
+<a href="{{ url_for('web.permits_edit', pid=permit.id) }}" class="btn btn-sm btn-primary">
+  <i class="bi bi-pencil me-1"></i>تعديل
+</a>
+<a href="/api/permits/{{ permit.id }}/pdf" class="btn btn-sm btn-outline-secondary">
+  <i class="bi bi-file-pdf me-1"></i>تحميل PDF
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row g-3">
+  <div class="col-lg-8">
+    <div class="card mb-3">
+      <div class="card-header px-4 py-3">
+        <i class="bi bi-file-earmark-text text-primary me-2"></i>بيانات التصريح
+      </div>
+      <div class="card-body px-4">
+        <div class="row g-3">
+          <div class="col-sm-6">
+            <label class="form-label text-muted" style="font-size:.78rem;">رقم التصريح</label>
+            <div><code style="font-size:1.05rem;">{{ permit.permitNumber }}</code></div>
+          </div>
+          <div class="col-sm-6">
+            <label class="form-label text-muted" style="font-size:.78rem;">الحالة</label>
+            <div><span class="status-badge badge-{{ permit.status }}">{{ status_ar.get(permit.status, permit.status) }}</span></div>
+          </div>
+          <div class="col-sm-6">
+            <label class="form-label text-muted" style="font-size:.78rem;">المهنة</label>
+            <div>{{ permit.occupation or '-' }}</div>
+          </div>
+          <div class="col-sm-6">
+            <label class="form-label text-muted" style="font-size:.78rem;">موقع العمل</label>
+            <div>{{ permit.workLocation or '-' }}</div>
+          </div>
+          <div class="col-sm-4">
+            <label class="form-label text-muted" style="font-size:.78rem;">تاريخ الإصدار</label>
+            <div>{{ permit.issueDate or '-' }}</div>
+          </div>
+          <div class="col-sm-4">
+            <label class="form-label text-muted" style="font-size:.78rem;">تاريخ البداية</label>
+            <div>{{ permit.startDate or '-' }}</div>
+          </div>
+          <div class="col-sm-4">
+            <label class="form-label text-muted" style="font-size:.78rem;">تاريخ الانتهاء</label>
+            <div class="{{ 'text-danger fw-600' if permit.status == 'active' }}">{{ permit.expiryDate or '-' }}</div>
+          </div>
+          {% if permit.notes %}
+          <div class="col-12">
+            <label class="form-label text-muted" style="font-size:.78rem;">ملاحظات</label>
+            <div>{{ permit.notes }}</div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-3">
+      <div class="col-sm-6">
+        <div class="card">
+          <div class="card-header px-4 py-3">
+            <i class="bi bi-building text-info me-2"></i>الشركة المقدمة
+          </div>
+          <div class="card-body px-4">
+            {% if permit.providerCompany %}
+            <div class="fw-600 mb-1">{{ permit.providerCompany.name }}</div>
+            <div class="text-muted" style="font-size:.82rem;">{{ permit.providerCompany.companyNumber }}</div>
+            <div class="text-muted" style="font-size:.82rem;">{{ permit.providerCompany.city }}</div>
+            {% else %}<span class="text-muted">-</span>{% endif %}
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6">
+        <div class="card">
+          <div class="card-header px-4 py-3">
+            <i class="bi bi-building-check text-success me-2"></i>الشركة المستفيدة
+          </div>
+          <div class="card-body px-4">
+            {% if permit.beneficiaryCompany %}
+            <div class="fw-600 mb-1">{{ permit.beneficiaryCompany.name }}</div>
+            <div class="text-muted" style="font-size:.82rem;">{{ permit.beneficiaryCompany.companyNumber }}</div>
+            <div class="text-muted" style="font-size:.82rem;">{{ permit.beneficiaryCompany.city }}</div>
+            {% else %}<span class="text-muted">-</span>{% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card mb-3">
+      <div class="card-header px-4 py-3">
+        <i class="bi bi-person text-primary me-2"></i>بيانات العامل
+      </div>
+      <div class="card-body px-4">
+        {% if permit.worker %}
+        <div class="fw-600 mb-2">{{ permit.worker.fullName }}</div>
+        <div class="text-muted" style="font-size:.82rem;"><i class="bi bi-card-text me-1"></i>{{ permit.worker.idNumber }}</div>
+        <div class="text-muted" style="font-size:.82rem;"><i class="bi bi-globe me-1"></i>{{ permit.worker.nationality }}</div>
+        <div class="text-muted" style="font-size:.82rem;"><i class="bi bi-briefcase me-1"></i>{{ permit.worker.occupation }}</div>
+        {% if permit.worker.phone %}
+        <div class="text-muted" style="font-size:.82rem;"><i class="bi bi-phone me-1"></i>{{ permit.worker.phone }}</div>
+        {% endif %}
+        {% else %}<span class="text-muted">-</span>{% endif %}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header px-4 py-3">
+        <i class="bi bi-qr-code text-secondary me-2"></i>رمز QR
+      </div>
+      <div class="card-body text-center px-4">
+        <img src="/api/permits/{{ permit.id }}/qr" alt="QR" style="max-width:160px;border-radius:8px;"/>
+        <div class="mt-2" style="font-size:.78rem;color:#94a3b8;">{{ permit.permitNumber }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mt-3 d-flex gap-2">
+  <a href="{{ url_for('web.permits_list') }}" class="btn btn-outline-secondary">
+    <i class="bi bi-arrow-right me-1"></i>رجوع
+  </a>
+  <form method="POST" action="{{ url_for('web.permits_delete', pid=permit.id) }}"
+        onsubmit="return confirm('هل تريد حذف هذا التصريح نهائياً؟')">
+    <button class="btn btn-outline-danger"><i class="bi bi-trash me-1"></i>حذف التصريح</button>
+  </form>
+</div>
+{% endblock %}

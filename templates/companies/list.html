@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block title %}الشركات{% endblock %}
+{% block page_title %}الشركات{% endblock %}
+{% block topbar_actions %}
+<a href="{{ url_for('web.companies_new') }}" class="btn btn-sm btn-primary">
+  <i class="bi bi-plus-lg me-1"></i>إضافة شركة
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header px-4 py-3">
+    <form method="GET" class="d-flex gap-2 flex-wrap">
+      <input type="text" name="q" value="{{ q }}" class="form-control form-control-sm" style="max-width:260px" placeholder="بحث باسم الشركة..."/>
+      <select name="status" class="form-select form-select-sm" style="max-width:160px" onchange="this.form.submit()">
+        <option value="">كل الحالات</option>
+        <option value="active"    {{ 'selected' if status=='active' }}>نشطة</option>
+        <option value="suspended" {{ 'selected' if status=='suspended' }}>موقوفة</option>
+      </select>
+      <button type="submit" class="btn btn-sm btn-outline-secondary"><i class="bi bi-search"></i></button>
+      {% if q or status %}<a href="{{ url_for('web.companies_list') }}" class="btn btn-sm btn-outline-secondary">مسح</a>{% endif %}
+    </form>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr>
+          <th>اسم الشركة</th>
+          <th>رقم السجل</th>
+          <th>المدينة</th>
+          <th>الهاتف</th>
+          <th>الحالة</th>
+          <th>إجراءات</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in companies %}
+        <tr>
+          <td class="fw-600">{{ c.name }}</td>
+          <td><code>{{ c.companyNumber }}</code></td>
+          <td>{{ c.city or '-' }}</td>
+          <td>{{ c.phone or '-' }}</td>
+          <td><span class="status-badge badge-{{ c.status }}">{{ status_ar.get(c.status, c.status) }}</span></td>
+          <td>
+            <div class="d-flex gap-1">
+              <a href="{{ url_for('web.companies_edit', cid=c.id) }}" class="btn btn-sm btn-outline-primary" title="تعديل"><i class="bi bi-pencil"></i></a>
+              <form method="POST" action="{{ url_for('web.companies_delete', cid=c.id) }}" onsubmit="return confirm('هل تريد حذف هذه الشركة؟')">
+                <button class="btn btn-sm btn-outline-danger" title="حذف"><i class="bi bi-trash"></i></button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6"><div class="empty-state"><i class="bi bi-building-slash"></i>لا توجد شركات</div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

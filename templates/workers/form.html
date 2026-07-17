@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block title %}{{ 'تعديل عامل' if worker else 'إضافة عامل' }}{% endblock %}
+{% block page_title %}{{ 'تعديل بيانات العامل' if worker else 'إضافة عامل جديد' }}{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width:800px;">
+  <div class="card-header px-4 py-3">
+    <i class="bi bi-person-plus text-primary me-2"></i>
+    {{ 'تعديل بيانات العامل' if worker else 'بيانات العامل الجديد' }}
+  </div>
+  <div class="card-body px-4 py-4">
+    <form method="POST" action="{{ url_for('web.workers_update', wid=worker.id) if worker else url_for('web.workers_create') }}">
+      <div class="row g-3">
+        <div class="col-sm-6">
+          <label class="form-label fw-600">الاسم الكامل <span class="text-danger">*</span></label>
+          <input type="text" name="fullName" class="form-control" required
+                 value="{{ worker.fullName if worker else '' }}" placeholder="الاسم الرباعي"/>
+        </div>
+        <div class="col-sm-6">
+          <label class="form-label fw-600">رقم الهوية</label>
+          <input type="text" name="idNumber" class="form-control"
+                 value="{{ worker.idNumber if worker else '' }}"/>
+        </div>
+        <div class="col-sm-6">
+          <label class="form-label fw-600">الجنسية</label>
+          <input type="text" name="nationality" class="form-control"
+                 value="{{ worker.nationality if worker else '' }}" placeholder="مثال: يمني"/>
+        </div>
+        <div class="col-sm-6">
+          <label class="form-label fw-600">المهنة</label>
+          <input type="text" name="occupation" class="form-control"
+                 value="{{ worker.occupation if worker else '' }}" placeholder="مثال: عامل بناء"/>
+        </div>
+        <div class="col-sm-6">
+          <label class="form-label fw-600">رقم الجواز</label>
+          <input type="text" name="passportNumber" class="form-control"
+                 value="{{ worker.passportNumber if worker else '' }}"/>
+        </div>
+        <div class="col-sm-6">
+          <label class="form-label fw-600">تاريخ الميلاد</label>
+          <input type="date" name="birthDate" class="form-control"
+                 value="{{ worker.birthDate if worker else '' }}"/>
+        </div>
+        <div class="col-sm-6">
+          <label class="form-label fw-600">رقم الجوال</label>
+          <input type="text" name="phone" class="form-control"
+                 value="{{ worker.phone if worker else '' }}" placeholder="05xxxxxxxx"/>
+        </div>
+        <div class="col-sm-6">
+          <label class="form-label fw-600">البريد الإلكتروني</label>
+          <input type="email" name="email" class="form-control"
+                 value="{{ worker.email if worker else '' }}"/>
+        </div>
+        <div class="col-sm-6">
+          <label class="form-label fw-600">الشركة</label>
+          <select name="companyId" class="form-select">
+            <option value="">-- بدون شركة --</option>
+            {% for c in companies %}
+            <option value="{{ c.id }}" {{ 'selected' if worker and worker.companyId == c.id }}>{{ c.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-sm-6">
+          <label class="form-label fw-600">الحالة</label>
+          <select name="status" class="form-select">
+            <option value="active"    {{ 'selected' if worker and worker.status == 'active' }}>نشط</option>
+            <option value="suspended" {{ 'selected' if worker and worker.status == 'suspended' }}>موقوف</option>
+          </select>
+        </div>
+      </div>
+      <div class="d-flex gap-2 mt-4">
+        <button type="submit" class="btn btn-primary">
+          <i class="bi bi-check-lg me-1"></i>{{ 'حفظ التعديلات' if worker else 'إضافة العامل' }}
+        </button>
+        <a href="{{ url_for('web.workers_list') }}" class="btn btn-outline-secondary">إلغاء</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

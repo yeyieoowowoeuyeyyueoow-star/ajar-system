@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}سجل النشاط{% endblock %}
+{% block page_title %}سجل النشاط{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header px-4 py-3">
+    <form method="GET" class="d-flex gap-2">
+      <input type="text" name="q" value="{{ q }}" class="form-control form-control-sm" style="max-width:300px" placeholder="بحث في السجل..."/>
+      <button type="submit" class="btn btn-sm btn-outline-secondary"><i class="bi bi-search"></i></button>
+      {% if q %}<a href="{{ url_for('web.logs_view') }}" class="btn btn-sm btn-outline-secondary">مسح</a>{% endif %}
+    </form>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr>
+          <th>الإجراء</th>
+          <th>المستخدم</th>
+          <th>التفاصيل</th>
+          <th>التوقيت</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for log in paged.data %}
+        <tr>
+          <td>
+            <span class="badge bg-primary bg-opacity-10 text-primary">{{ log.action }}</span>
+          </td>
+          <td>{{ log.userName }}</td>
+          <td style="max-width:400px;font-size:.85rem;">{{ log.details or '-' }}</td>
+          <td style="font-size:.82rem;white-space:nowrap;color:#64748b;">{{ log.createdAt[:19].replace('T',' ') if log.createdAt else '-' }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4"><div class="empty-state"><i class="bi bi-clock-history"></i>لا توجد سجلات</div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% if paged.totalPages > 1 %}
+  <div class="card-footer d-flex justify-content-between align-items-center px-4 py-3">
+    <small class="text-muted">{{ paged.total }} سجل — صفحة {{ paged.page }} من {{ paged.totalPages }}</small>
+    <div class="d-flex gap-1">
+      {% if paged.page > 1 %}<a href="?q={{ q }}&page={{ paged.page - 1 }}" class="btn btn-sm btn-outline-secondary">السابق</a>{% endif %}
+      {% if paged.page < paged.totalPages %}<a href="?q={{ q }}&page={{ paged.page + 1 }}" class="btn btn-sm btn-outline-secondary">التالي</a>{% endif %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
