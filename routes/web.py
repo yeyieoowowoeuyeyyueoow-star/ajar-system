@@ -173,9 +173,9 @@ def permits_create():
         'expiryDate':           f.get('expiryDate', ''),
         'issueDate':            f.get('issueDate', ''),
     }
-    db.create_permit(data, u['id'])
+    p = db.create_permit(data, u['id'])
     flash('تم إنشاء التصريح بنجاح', 'success')
-    return redirect(url_for('web.permits_list'))
+    return redirect(url_for('web.permits_detail', pid=p['id']))
 
 
 @web_bp.get('/permits/<pid>')
@@ -253,6 +253,21 @@ def permits_pdf(pid):
     return send_file(io.BytesIO(pdf_bytes), mimetype='application/pdf',
                      as_attachment=True,
                      download_name=f'{p["permitNumber"]}.pdf')
+
+
+@web_bp.get('/permits/<pid>/pdf/preview')
+@login_required
+def permits_pdf_preview(pid):
+    import io
+    from flask import send_file
+    from pdf.generator import generate_permit_pdf
+    p = db.get_permit(pid)
+    if not p:
+        flash('التصريح غير موجود', 'danger')
+        return redirect(url_for('web.permits_list'))
+    pdf_bytes = generate_permit_pdf(p)
+    return send_file(io.BytesIO(pdf_bytes), mimetype='application/pdf',
+                     as_attachment=False)
 
 
 # ── Workers ───────────────────────────────────────────────────────────────────
