@@ -3,16 +3,21 @@
 {% block page_title %}التصاريح{% endblock %}
 {% block topbar_actions %}
 <a href="{{ url_for('web.permits_new') }}" class="btn btn-sm btn-primary">
-  <i class="bi bi-plus-lg me-1"></i>إضافة تصريح
+  <i class="bi bi-plus-lg me-1"></i>تصريح جديد
 </a>
 {% endblock %}
 
 {% block content %}
 <div class="card">
-  <div class="card-header px-4 py-3">
-    <form method="GET" class="d-flex gap-2 flex-wrap">
-      <input type="text" name="q" value="{{ q }}" class="form-control form-control-sm" style="max-width:260px" placeholder="بحث برقم التصريح أو اسم العامل..."/>
-      <select name="status" class="form-select form-select-sm" style="max-width:160px" onchange="this.form.submit()">
+  <!-- Search bar -->
+  <div class="card-header">
+    <form method="GET" class="search-bar">
+      <div class="search-input-wrap">
+        <i class="bi bi-search"></i>
+        <input type="text" name="q" value="{{ q }}" class="form-control"
+               placeholder="رقم التصريح أو اسم العامل..."/>
+      </div>
+      <select name="status" class="form-select" style="max-width:155px" onchange="this.form.submit()">
         <option value="">كل الحالات</option>
         <option value="active"    {{ 'selected' if status=='active' }}>ساري</option>
         <option value="pending"   {{ 'selected' if status=='pending' }}>قيد الانتظار</option>
@@ -20,17 +25,24 @@
         <option value="rejected"  {{ 'selected' if status=='rejected' }}>مرفوض</option>
         <option value="suspended" {{ 'selected' if status=='suspended' }}>موقوف</option>
       </select>
-      <button type="submit" class="btn btn-sm btn-outline-secondary"><i class="bi bi-search"></i></button>
-      {% if q or status %}<a href="{{ url_for('web.permits_list') }}" class="btn btn-sm btn-outline-secondary">مسح</a>{% endif %}
+      <button type="submit" class="btn btn-sm btn-primary">
+        <i class="bi bi-search me-1"></i>بحث
+      </button>
+      {% if q or status %}
+      <a href="{{ url_for('web.permits_list') }}" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-x me-1"></i>مسح
+      </a>
+      {% endif %}
     </form>
   </div>
+
   <div class="table-responsive">
-    <table class="table table-hover mb-0">
+    <table class="data-table">
       <thead>
         <tr>
           <th>رقم التصريح</th>
           <th>العامل</th>
-          <th>الشركة المقدمة</th>
+          <th>الشركة المقدِّمة</th>
           <th>الشركة المستفيدة</th>
           <th>تاريخ الانتهاء</th>
           <th>الحالة</th>
@@ -41,38 +53,60 @@
         {% for p in permits %}
         <tr>
           <td><code>{{ p.permitNumber }}</code></td>
-          <td>{{ p.workerName or '-' }}</td>
-          <td style="max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ p.companyName or '-' }}</td>
-          <td style="max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ p.beneficiaryCompany.name if p.beneficiaryCompany else '-' }}</td>
-          <td>{{ p.expiryDate or '-' }}</td>
+          <td style="font-weight:600;">{{ p.workerName or '—' }}</td>
+          <td style="color:var(--text-2);max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+            {{ p.companyName or '—' }}
+          </td>
+          <td style="color:var(--text-2);max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+            {{ p.beneficiaryCompany.name if p.beneficiaryCompany else '—' }}
+          </td>
+          <td style="font-size:.84rem;">{{ p.expiryDate or '—' }}</td>
           <td>
-            <span class="status-badge badge-{{ p.status }}">{{ status_ar.get(p.status, p.status) }}</span>
+            <span class="sbadge sbadge-{{ p.status }}">
+              {{ status_ar.get(p.status, p.status) }}
+            </span>
           </td>
           <td>
             <div class="d-flex gap-1">
-              <a href="{{ url_for('web.permits_detail', pid=p.id) }}" class="btn btn-sm btn-outline-secondary" title="عرض"><i class="bi bi-eye"></i></a>
-              <a href="{{ url_for('web.permits_edit', pid=p.id) }}" class="btn btn-sm btn-outline-primary" title="تعديل"><i class="bi bi-pencil"></i></a>
-              <form method="POST" action="{{ url_for('web.permits_delete', pid=p.id) }}" onsubmit="return confirm('هل تريد حذف هذا التصريح؟')">
-                <button class="btn btn-sm btn-outline-danger" title="حذف"><i class="bi bi-trash"></i></button>
+              <a href="{{ url_for('web.permits_detail', pid=p.id) }}"
+                 class="btn btn-icon btn-outline-secondary" title="عرض">
+                <i class="bi bi-eye"></i>
+              </a>
+              <a href="{{ url_for('web.permits_edit', pid=p.id) }}"
+                 class="btn btn-icon btn-outline-primary" title="تعديل">
+                <i class="bi bi-pencil"></i>
+              </a>
+              <form method="POST" action="{{ url_for('web.permits_delete', pid=p.id) }}"
+                    onsubmit="return confirm('هل تريد حذف هذا التصريح؟')">
+                <button class="btn btn-icon btn-outline-danger" title="حذف">
+                  <i class="bi bi-trash"></i>
+                </button>
               </form>
             </div>
           </td>
         </tr>
         {% else %}
-        <tr><td colspan="7"><div class="empty-state"><i class="bi bi-file-earmark-x"></i>لا توجد تصاريح</div></td></tr>
+        <tr><td colspan="7">
+          <div class="empty-state">
+            <i class="bi bi-file-earmark-x"></i>
+            <p>لا توجد تصاريح{% if q or status %} تطابق البحث{% endif %}</p>
+          </div>
+        </td></tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
+
   {% if paged.totalPages > 1 %}
   <div class="card-footer d-flex justify-content-between align-items-center px-4 py-3">
-    <small class="text-muted">{{ paged.total }} تصريح — صفحة {{ paged.page }} من {{ paged.totalPages }}</small>
-    <div class="d-flex gap-1">
+    <small style="color:var(--text-3);">{{ paged.total }} تصريح — صفحة {{ paged.page }} من {{ paged.totalPages }}</small>
+    <div class="pager">
       {% if paged.page > 1 %}
-      <a href="?q={{ q }}&status={{ status }}&page={{ paged.page - 1 }}" class="btn btn-sm btn-outline-secondary">السابق</a>
+      <a href="?q={{ q }}&status={{ status }}&page={{ paged.page - 1 }}"><i class="bi bi-chevron-right"></i></a>
       {% endif %}
+      <span>{{ paged.page }}</span>
       {% if paged.page < paged.totalPages %}
-      <a href="?q={{ q }}&status={{ status }}&page={{ paged.page + 1 }}" class="btn btn-sm btn-outline-secondary">التالي</a>
+      <a href="?q={{ q }}&status={{ status }}&page={{ paged.page + 1 }}"><i class="bi bi-chevron-left"></i></a>
       {% endif %}
     </div>
   </div>

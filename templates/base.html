@@ -6,212 +6,496 @@
   <title>{% block title %}نظام أجير{% endblock %} — منصة إدارة تصاريح العمل</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet"/>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
   <style>
     :root {
-      --sidebar-bg: #0f2444;
-      --sidebar-hover: #1a3660;
-      --sidebar-active: #1e4080;
-      --sidebar-text: #c8d8f0;
-      --sidebar-width: 260px;
-      --accent: #3b82f6;
-      --accent-light: #eff6ff;
+      --sidebar-w: 265px;
+      --navy:      #0D1B2A;
+      --navy-2:    #112236;
+      --navy-3:    #1A3050;
+      --blue:      #3B82F6;
+      --blue-d:    #2563EB;
+      --blue-glow: rgba(59,130,246,.18);
+      --body-bg:   #F0F4FA;
+      --card-bg:   #FFFFFF;
+      --border:    #E4EAF3;
+      --text-1:    #0F1C2E;
+      --text-2:    #4B5B72;
+      --text-3:    #8A97A8;
+      --radius:    14px;
+      --shadow-sm: 0 2px 8px rgba(15,28,46,.07);
+      --shadow-md: 0 4px 20px rgba(15,28,46,.10);
+      --shadow-lg: 0 8px 40px rgba(15,28,46,.14);
     }
-    * { font-family: 'Cairo', sans-serif; }
-    body { background: #f1f5f9; min-height: 100vh; }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: var(--body-bg);
+      color: var(--text-1);
+      min-height: 100vh;
+      margin: 0;
+    }
 
-    /* ── Sidebar ── */
+    /* ══════════════════════════════════════
+       SIDEBAR
+    ══════════════════════════════════════ */
     .sidebar {
       position: fixed; top: 0; right: 0;
-      width: var(--sidebar-width); height: 100vh;
-      background: var(--sidebar-bg);
+      width: var(--sidebar-w); height: 100vh;
+      background: var(--navy);
+      background-image: linear-gradient(175deg, var(--navy-2) 0%, var(--navy) 60%);
       display: flex; flex-direction: column;
-      overflow-y: auto; z-index: 100;
-      box-shadow: -4px 0 20px rgba(0,0,0,.25);
+      overflow-y: auto; z-index: 200;
+      border-left: 1px solid rgba(255,255,255,.05);
     }
-    .sidebar-brand {
-      padding: 1.5rem 1.25rem 1rem;
-      border-bottom: 1px solid rgba(255,255,255,.08);
-    }
-    .sidebar-brand h5 { color: #fff; margin: 0; font-weight: 700; font-size: 1.1rem; }
-    .sidebar-brand small { color: var(--sidebar-text); font-size: .72rem; }
-    .sidebar-logo {
-      width: 36px; height: 36px; background: var(--accent);
-      border-radius: 10px; display: flex; align-items: center; justify-content: center;
-      color: #fff; font-size: 1.1rem; font-weight: 700; margin-left: .75rem;
-    }
-    .nav-section { padding: .75rem 1rem .25rem; font-size: .68rem;
-      font-weight: 600; text-transform: uppercase; letter-spacing: .08em;
-      color: rgba(200,216,240,.4); }
-    .sidebar nav a {
-      display: flex; align-items: center; gap: .65rem;
-      padding: .62rem 1.25rem; color: var(--sidebar-text);
-      text-decoration: none; font-size: .88rem; font-weight: 500;
-      border-right: 3px solid transparent;
-      transition: all .18s ease;
-    }
-    .sidebar nav a:hover { background: var(--sidebar-hover); color: #fff; }
-    .sidebar nav a.active {
-      background: var(--sidebar-active); color: #fff;
-      border-right-color: var(--accent);
-    }
-    .sidebar nav a i { font-size: 1rem; width: 20px; text-align: center; flex-shrink: 0; }
-    .sidebar-footer {
-      margin-top: auto; padding: 1rem 1.25rem;
-      border-top: 1px solid rgba(255,255,255,.08);
-    }
-    .sidebar-footer .user-name { color: #fff; font-size: .88rem; font-weight: 600; }
-    .sidebar-footer .user-role { color: var(--sidebar-text); font-size: .75rem; }
+    .sidebar::-webkit-scrollbar { width: 4px; }
+    .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 4px; }
 
-    /* ── Main ── */
-    .main-content {
-      margin-right: var(--sidebar-width);
+    /* Brand */
+    .sb-brand {
+      display: flex; align-items: center; gap: .85rem;
+      padding: 1.4rem 1.3rem 1.2rem;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      text-decoration: none;
+    }
+    .sb-logo {
+      width: 40px; height: 40px; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--blue), #6366f1);
+      border-radius: 11px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.15rem; font-weight: 800; color: #fff;
+      box-shadow: 0 4px 12px rgba(59,130,246,.4);
+    }
+    .sb-brand-text { line-height: 1.2; }
+    .sb-brand-text strong { display: block; color: #fff; font-size: .97rem; font-weight: 700; }
+    .sb-brand-text span { color: rgba(200,216,240,.5); font-size: .7rem; }
+
+    /* Nav */
+    .sb-section {
+      padding: 1.1rem 1.2rem .3rem;
+      font-size: .63rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .12em;
+      color: rgba(200,216,240,.35);
+    }
+    .sb-nav-link {
+      display: flex; align-items: center; gap: .7rem;
+      padding: .55rem 1.15rem .55rem 1rem;
+      margin: .1rem .7rem;
+      border-radius: 10px;
+      color: rgba(200,216,240,.7);
+      text-decoration: none;
+      font-size: .875rem; font-weight: 500;
+      transition: all .18s ease;
+      position: relative;
+    }
+    .sb-nav-link i { font-size: 1rem; width: 20px; text-align: center; flex-shrink: 0; }
+    .sb-nav-link:hover {
+      background: rgba(59,130,246,.1);
+      color: #fff;
+    }
+    .sb-nav-link.active {
+      background: rgba(59,130,246,.18);
+      color: #fff;
+      font-weight: 600;
+    }
+    .sb-nav-link.active::after {
+      content: '';
+      position: absolute; left: 0; top: 20%; bottom: 20%;
+      width: 3px; border-radius: 0 3px 3px 0;
+      background: var(--blue);
+    }
+    .sb-nav-link .badge-count {
+      margin-right: auto;
+      background: var(--blue); color: #fff;
+      font-size: .65rem; font-weight: 700;
+      padding: .15rem .45rem; border-radius: 20px;
+    }
+
+    /* User footer */
+    .sb-footer {
+      margin-top: auto;
+      padding: 1rem 1.2rem;
+      border-top: 1px solid rgba(255,255,255,.06);
+    }
+    .sb-user {
+      display: flex; align-items: center; gap: .7rem;
+    }
+    .sb-avatar {
+      width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--blue), #8b5cf6);
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-weight: 700; font-size: .85rem;
+      box-shadow: 0 2px 8px rgba(59,130,246,.35);
+    }
+    .sb-user-info { flex: 1; min-width: 0; }
+    .sb-user-name { color: #fff; font-size: .84rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sb-user-role { color: rgba(200,216,240,.45); font-size: .7rem; }
+    .sb-logout {
+      color: rgba(200,216,240,.4); font-size: 1rem;
+      text-decoration: none; transition: color .15s;
+      padding: .3rem;
+    }
+    .sb-logout:hover { color: #ef4444; }
+
+    /* ══════════════════════════════════════
+       MAIN LAYOUT
+    ══════════════════════════════════════ */
+    .main-wrap {
+      margin-right: var(--sidebar-w);
       min-height: 100vh;
       display: flex; flex-direction: column;
     }
+
+    /* Topbar */
     .topbar {
-      background: #fff; border-bottom: 1px solid #e2e8f0;
-      padding: .75rem 1.5rem;
-      display: flex; align-items: center; justify-content: space-between;
-      position: sticky; top: 0; z-index: 50;
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border);
+      padding: .7rem 1.75rem;
+      display: flex; align-items: center; gap: 1rem;
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: var(--shadow-sm);
     }
-    .page-content { padding: 1.5rem; flex: 1; }
+    .topbar-title { font-size: 1.2rem; font-weight: 700; color: var(--text-1); }
+    .topbar-divider { width: 1px; height: 22px; background: var(--border); flex-shrink: 0; }
+    .topbar-search {
+      display: flex; align-items: center; gap: .5rem;
+      background: var(--body-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: .38rem .85rem;
+      color: var(--text-3);
+      text-decoration: none;
+      font-size: .82rem;
+      transition: all .15s;
+    }
+    .topbar-search:hover { border-color: var(--blue); color: var(--blue); background: #EFF6FF; }
+    .topbar-actions { display: flex; align-items: center; gap: .5rem; margin-right: auto; }
 
-    /* ── Cards ── */
-    .card { border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
-    .card-header { background: #fff; border-bottom: 1px solid #e2e8f0;
-      border-radius: 12px 12px 0 0 !important; font-weight: 600; }
+    /* Page content */
+    .page-body { padding: 1.6rem 1.75rem; flex: 1; }
 
-    /* ── Status badges ── */
-    .badge-active   { background: #dcfce7; color: #166534; }
-    .badge-pending  { background: #fef9c3; color: #854d0e; }
-    .badge-expired  { background: #fee2e2; color: #991b1b; }
-    .badge-rejected { background: #fce7f3; color: #9d174d; }
-    .badge-suspended{ background: #f1f5f9; color: #475569; }
-    .status-badge { padding: .25rem .65rem; border-radius: 20px; font-size: .78rem; font-weight: 600; }
+    /* Flash alerts */
+    .flash-wrap { margin-bottom: 1.25rem; }
+    .flash-alert {
+      display: flex; align-items: center; gap: .75rem;
+      padding: .8rem 1.1rem; border-radius: 12px;
+      font-size: .875rem; font-weight: 500;
+      border: none; margin-bottom: .5rem;
+    }
+    .flash-alert.alert-success { background: #DCFCE7; color: #166534; }
+    .flash-alert.alert-danger  { background: #FEE2E2; color: #991B1B; }
+    .flash-alert.alert-warning { background: #FEF9C3; color: #854D0E; }
+    .flash-alert.alert-info    { background: #DBEAFE; color: #1E40AF; }
+    .flash-icon { font-size: 1.1rem; flex-shrink: 0; }
 
-    /* ── Stat cards ── */
-    .stat-card { border-radius: 14px; padding: 1.35rem 1.5rem; color: #fff; }
-    .stat-card .stat-icon { width: 48px; height: 48px; border-radius: 12px;
-      background: rgba(255,255,255,.2); display: flex; align-items: center;
-      justify-content: center; font-size: 1.4rem; }
-    .stat-card .stat-num { font-size: 2rem; font-weight: 700; line-height: 1; }
-    .stat-card .stat-label { font-size: .82rem; opacity: .85; margin-top: .2rem; }
+    /* ══════════════════════════════════════
+       CARDS
+    ══════════════════════════════════════ */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+    .card-header {
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 1.4rem;
+      font-weight: 600; font-size: .92rem;
+      color: var(--text-1);
+    }
+    .card-footer {
+      background: #FAFBFD;
+      border-top: 1px solid var(--border);
+    }
 
-    /* ── Table ── */
-    .table thead th { background: #f8fafc; font-size: .8rem; font-weight: 600;
-      text-transform: uppercase; color: #64748b; letter-spacing: .04em; }
-    .table td, .table th { vertical-align: middle; }
-    .table tbody tr:hover { background: var(--accent-light); }
+    /* ══════════════════════════════════════
+       TABLES
+    ══════════════════════════════════════ */
+    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table thead th {
+      background: #F7F9FD;
+      padding: .7rem 1rem;
+      font-size: .73rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .06em;
+      color: var(--text-3);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    .data-table tbody td {
+      padding: .8rem 1rem;
+      font-size: .875rem;
+      color: var(--text-1);
+      border-bottom: 1px solid #F0F3F9;
+      vertical-align: middle;
+    }
+    .data-table tbody tr:last-child td { border-bottom: none; }
+    .data-table tbody tr {
+      transition: background .12s;
+    }
+    .data-table tbody tr:hover { background: #F5F8FF; }
 
-    /* ── Buttons ── */
-    .btn-primary { background: var(--accent); border-color: var(--accent); }
-    .btn-primary:hover { background: #2563eb; border-color: #2563eb; }
+    /* ══════════════════════════════════════
+       STATUS BADGES
+    ══════════════════════════════════════ */
+    .sbadge {
+      display: inline-flex; align-items: center; gap: .35rem;
+      padding: .28rem .7rem; border-radius: 20px;
+      font-size: .75rem; font-weight: 600;
+      white-space: nowrap;
+    }
+    .sbadge::before {
+      content: ''; width: 6px; height: 6px;
+      border-radius: 50%; flex-shrink: 0;
+    }
+    .sbadge-active    { background: #DCFCE7; color: #166534; }
+    .sbadge-active::before { background: #22C55E; }
+    .sbadge-pending   { background: #FEF9C3; color: #854D0E; }
+    .sbadge-pending::before { background: #EAB308; }
+    .sbadge-expired   { background: #FEE2E2; color: #991B1B; }
+    .sbadge-expired::before { background: #EF4444; }
+    .sbadge-rejected  { background: #FCE7F3; color: #9D174D; }
+    .sbadge-rejected::before { background: #EC4899; }
+    .sbadge-suspended { background: #F1F5F9; color: #475569; }
+    .sbadge-suspended::before { background: #94A3B8; }
 
-    /* ── Misc ── */
-    .page-title { font-size: 1.35rem; font-weight: 700; color: #1e293b; }
-    .breadcrumb { font-size: .82rem; }
-    .empty-state { text-align: center; padding: 3rem; color: #94a3b8; }
-    .empty-state i { font-size: 3rem; display: block; margin-bottom: .75rem; }
+    /* ══════════════════════════════════════
+       BUTTONS
+    ══════════════════════════════════════ */
+    .btn { border-radius: 9px; font-family: 'Cairo', sans-serif; font-weight: 600; transition: all .15s; }
+    .btn-primary {
+      background: var(--blue); border-color: var(--blue); color: #fff;
+      box-shadow: 0 2px 8px rgba(59,130,246,.3);
+    }
+    .btn-primary:hover { background: var(--blue-d); border-color: var(--blue-d); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(59,130,246,.4); }
+    .btn-outline-secondary { border-color: var(--border); color: var(--text-2); }
+    .btn-outline-secondary:hover { background: var(--body-bg); border-color: #C9D4E4; color: var(--text-1); }
+    .btn-outline-primary { border-color: var(--blue); color: var(--blue); }
+    .btn-outline-primary:hover { background: #EFF6FF; }
+    .btn-outline-danger { border-color: #FECACA; color: #EF4444; }
+    .btn-outline-danger:hover { background: #FEF2F2; border-color: #EF4444; }
+    .btn-icon {
+      width: 32px; height: 32px; padding: 0;
+      display: inline-flex; align-items: center; justify-content: center;
+      border-radius: 8px;
+    }
+
+    /* ══════════════════════════════════════
+       FORMS
+    ══════════════════════════════════════ */
+    .form-label { font-size: .82rem; font-weight: 600; color: var(--text-2); margin-bottom: .35rem; }
+    .form-control, .form-select {
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: .55rem .9rem;
+      font-family: 'Cairo', sans-serif;
+      font-size: .875rem;
+      color: var(--text-1);
+      background: #FAFBFD;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .form-control:focus, .form-select:focus {
+      border-color: var(--blue);
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(59,130,246,.12);
+      outline: none;
+    }
+    .form-control::placeholder { color: var(--text-3); }
+    .form-text { font-size: .75rem; color: var(--text-3); }
+
+    /* ══════════════════════════════════════
+       STAT CARDS
+    ══════════════════════════════════════ */
+    .stat-card {
+      border-radius: var(--radius);
+      padding: 1.25rem 1.4rem;
+      color: #fff;
+      position: relative; overflow: hidden;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+    .stat-card::after {
+      content: ''; position: absolute;
+      right: -20px; top: -20px;
+      width: 100px; height: 100px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.07);
+    }
+    .stat-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: rgba(255,255,255,.18);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.25rem; margin-bottom: .85rem;
+    }
+    .stat-num { font-size: 2.1rem; font-weight: 800; line-height: 1; }
+    .stat-label { font-size: .78rem; opacity: .8; margin-top: .3rem; }
+
+    /* ══════════════════════════════════════
+       MISC
+    ══════════════════════════════════════ */
+    .page-fade { animation: pageFade .25s ease; }
+    @keyframes pageFade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+    code {
+      background: #EFF6FF; color: #2563EB;
+      padding: .15rem .45rem; border-radius: 6px;
+      font-size: .82rem;
+    }
+    .empty-state {
+      text-align: center; padding: 3.5rem 1rem;
+      color: var(--text-3);
+    }
+    .empty-state i { font-size: 2.8rem; display: block; margin-bottom: .75rem; opacity: .4; }
+    .empty-state p { font-size: .875rem; margin: 0; }
+
+    .info-label { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--text-3); margin-bottom: .3rem; }
+    .info-value { font-size: .92rem; color: var(--text-1); font-weight: 500; }
+
+    .divider { height: 1px; background: var(--border); margin: 1rem 0; }
+
+    /* Pagination */
+    .pager { display: flex; align-items: center; gap: .4rem; }
+    .pager a, .pager span {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 34px; height: 34px; border-radius: 8px;
+      font-size: .82rem; font-weight: 600;
+      text-decoration: none; transition: all .15s;
+    }
+    .pager a { background: var(--card-bg); border: 1px solid var(--border); color: var(--text-2); }
+    .pager a:hover { border-color: var(--blue); color: var(--blue); background: #EFF6FF; }
+    .pager span { background: var(--blue); color: #fff; border: 1px solid var(--blue); }
+
+    /* Search bar */
+    .search-bar {
+      display: flex; align-items: center; gap: .6rem;
+      flex-wrap: wrap;
+    }
+    .search-input-wrap {
+      position: relative; flex: 1; min-width: 200px; max-width: 320px;
+    }
+    .search-input-wrap i {
+      position: absolute; right: .75rem; top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-3); font-size: .9rem; pointer-events: none;
+    }
+    .search-input-wrap input {
+      padding-right: 2.2rem; width: 100%;
+    }
 
     @media (max-width: 768px) {
-      .sidebar { display: none; }
-      .main-content { margin-right: 0; }
+      .sidebar { transform: translateX(100%); transition: transform .25s; }
+      .sidebar.open { transform: none; }
+      .main-wrap { margin-right: 0; }
     }
   </style>
   {% block head %}{% endblock %}
 </head>
 <body>
-  <!-- Sidebar -->
-  <aside class="sidebar">
-    <div class="sidebar-brand d-flex align-items-center">
-      <div class="sidebar-logo">أ</div>
-      <div>
-        <h5>نظام أجير</h5>
-        <small>منصة إدارة تصاريح العمل</small>
-      </div>
-    </div>
-    <nav class="py-2">
-      <div class="nav-section">الرئيسية</div>
-      <a href="{{ url_for('web.dashboard') }}" class="{{ 'active' if request.endpoint == 'web.dashboard' }}">
-        <i class="bi bi-grid-1x2"></i> لوحة التحكم
-      </a>
-      <div class="nav-section">الإدارة</div>
-      <a href="{{ url_for('web.permits_list') }}" class="{{ 'active' if 'permit' in request.endpoint }}">
-        <i class="bi bi-file-earmark-text"></i> التصاريح
-      </a>
-      <a href="{{ url_for('web.workers_list') }}" class="{{ 'active' if 'worker' in request.endpoint }}">
-        <i class="bi bi-people"></i> العمال
-      </a>
-      <a href="{{ url_for('web.companies_list') }}" class="{{ 'active' if 'compan' in request.endpoint }}">
-        <i class="bi bi-building"></i> الشركات
-      </a>
-      {% if user and user.role == 'admin' %}
-      <div class="nav-section">النظام</div>
-      <a href="{{ url_for('web.users_list') }}" class="{{ 'active' if 'user' in request.endpoint }}">
-        <i class="bi bi-person-gear"></i> المستخدمون
-      </a>
-      {% endif %}
-      <div class="nav-section">أدوات</div>
-      <a href="{{ url_for('web.search_view') }}" class="{{ 'active' if 'search' in request.endpoint }}">
-        <i class="bi bi-search"></i> البحث الشامل
-      </a>
-      <a href="{{ url_for('web.logs_view') }}" class="{{ 'active' if 'log' in request.endpoint }}">
-        <i class="bi bi-clock-history"></i> سجل النشاط
-      </a>
-    </nav>
-    <div class="sidebar-footer">
-      {% if user %}
-      <div class="d-flex align-items-center gap-2">
-        <div style="width:34px;height:34px;background:var(--accent);border-radius:50%;
-          display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.85rem;flex-shrink:0;">
-          {{ user.fullName[0] }}
-        </div>
-        <div>
-          <div class="user-name">{{ user.fullName }}</div>
-          <div class="user-role">{{ {'admin':'مدير','manager':'مشرف','operator':'مشغل'}.get(user.role, user.role) }}</div>
-        </div>
-        <a href="{{ url_for('web.logout') }}" class="me-auto text-danger" title="تسجيل الخروج">
-          <i class="bi bi-box-arrow-right"></i>
-        </a>
-      </div>
-      {% endif %}
-    </div>
-  </aside>
 
-  <!-- Main Content -->
-  <div class="main-content">
-    <div class="topbar">
-      <div>
-        <span class="page-title">{% block page_title %}{% endblock %}</span>
-        {% block breadcrumb %}{% endblock %}
-      </div>
-      <div class="d-flex align-items-center gap-2">
-        <a href="{{ url_for('web.search_view') }}" class="btn btn-sm btn-outline-secondary">
-          <i class="bi bi-search me-1"></i>بحث
-        </a>
-        {% block topbar_actions %}{% endblock %}
-      </div>
+<!-- ═══ SIDEBAR ═══ -->
+<aside class="sidebar">
+  <a class="sb-brand" href="{{ url_for('web.dashboard') }}">
+    <div class="sb-logo">أ</div>
+    <div class="sb-brand-text">
+      <strong>نظام أجير</strong>
+      <span>إدارة تصاريح العمل</span>
     </div>
+  </a>
 
-    <div class="page-content">
-      {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-          {% for cat, msg in messages %}
-          <div class="alert alert-{{ cat }} alert-dismissible fade show" role="alert">
-            {{ msg }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-          </div>
-          {% endfor %}
-        {% endif %}
-      {% endwith %}
-      {% block content %}{% endblock %}
+  <nav>
+    <div class="sb-section">الرئيسية</div>
+    <a href="{{ url_for('web.dashboard') }}"
+       class="sb-nav-link {{ 'active' if request.endpoint == 'web.dashboard' }}">
+      <i class="bi bi-grid-1x2-fill"></i> لوحة التحكم
+    </a>
+
+    <div class="sb-section">الإدارة</div>
+    <a href="{{ url_for('web.permits_list') }}"
+       class="sb-nav-link {{ 'active' if 'permit' in request.endpoint }}">
+      <i class="bi bi-file-earmark-text-fill"></i> التصاريح
+    </a>
+    <a href="{{ url_for('web.workers_list') }}"
+       class="sb-nav-link {{ 'active' if 'worker' in request.endpoint }}">
+      <i class="bi bi-people-fill"></i> العمال
+    </a>
+    <a href="{{ url_for('web.companies_list') }}"
+       class="sb-nav-link {{ 'active' if 'compan' in request.endpoint }}">
+      <i class="bi bi-building-fill"></i> الشركات
+    </a>
+
+    {% if user and user.role == 'admin' %}
+    <div class="sb-section">النظام</div>
+    <a href="{{ url_for('web.users_list') }}"
+       class="sb-nav-link {{ 'active' if 'user' in request.endpoint }}">
+      <i class="bi bi-person-gear"></i> المستخدمون
+    </a>
+    {% endif %}
+
+    <div class="sb-section">أدوات</div>
+    <a href="{{ url_for('web.search_view') }}"
+       class="sb-nav-link {{ 'active' if 'search' in request.endpoint }}">
+      <i class="bi bi-search"></i> البحث الشامل
+    </a>
+    <a href="{{ url_for('web.logs_view') }}"
+       class="sb-nav-link {{ 'active' if 'log' in request.endpoint }}">
+      <i class="bi bi-clock-history"></i> سجل النشاط
+    </a>
+  </nav>
+
+  <div class="sb-footer">
+    {% if user %}
+    <div class="sb-user">
+      <div class="sb-avatar">{{ user.fullName[0] }}</div>
+      <div class="sb-user-info">
+        <div class="sb-user-name">{{ user.fullName }}</div>
+        <div class="sb-user-role">{{ {'admin':'مدير النظام','manager':'مشرف','operator':'مشغّل'}.get(user.role, user.role) }}</div>
+      </div>
+      <a href="{{ url_for('web.logout') }}" class="sb-logout" title="تسجيل الخروج">
+        <i class="bi bi-box-arrow-right"></i>
+      </a>
     </div>
+    {% endif %}
   </div>
+</aside>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  {% block scripts %}{% endblock %}
+<!-- ═══ MAIN ═══ -->
+<div class="main-wrap">
+  <header class="topbar">
+    <span class="topbar-title">{% block page_title %}{% endblock %}</span>
+    <div class="topbar-divider"></div>
+    <a href="{{ url_for('web.search_view') }}" class="topbar-search">
+      <i class="bi bi-search"></i>
+      <span>بحث سريع...</span>
+    </a>
+    <div class="topbar-actions">
+      {% block topbar_actions %}{% endblock %}
+    </div>
+  </header>
+
+  <main class="page-body page-fade">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      <div class="flash-wrap">
+        {% for cat, msg in messages %}
+        <div class="flash-alert alert-{{ cat }} alert-dismissible">
+          <i class="flash-icon bi bi-{{ 'check-circle-fill' if cat=='success' else 'exclamation-triangle-fill' if cat=='danger' else 'info-circle-fill' }}"></i>
+          <span>{{ msg }}</span>
+          <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+{% block scripts %}{% endblock %}
 </body>
 </html>

@@ -9,24 +9,35 @@
 
 {% block content %}
 <div class="card">
-  <div class="card-header px-4 py-3">
-    <form method="GET" class="d-flex gap-2 flex-wrap">
-      <input type="text" name="q" value="{{ q }}" class="form-control form-control-sm" style="max-width:260px" placeholder="بحث باسم الشركة..."/>
-      <select name="status" class="form-select form-select-sm" style="max-width:160px" onchange="this.form.submit()">
+  <div class="card-header">
+    <form method="GET" class="search-bar">
+      <div class="search-input-wrap">
+        <i class="bi bi-search"></i>
+        <input type="text" name="q" value="{{ q }}" class="form-control"
+               placeholder="اسم الشركة أو رقم المنشأة..."/>
+      </div>
+      <select name="status" class="form-select" style="max-width:150px" onchange="this.form.submit()">
         <option value="">كل الحالات</option>
         <option value="active"    {{ 'selected' if status=='active' }}>نشطة</option>
         <option value="suspended" {{ 'selected' if status=='suspended' }}>موقوفة</option>
       </select>
-      <button type="submit" class="btn btn-sm btn-outline-secondary"><i class="bi bi-search"></i></button>
-      {% if q or status %}<a href="{{ url_for('web.companies_list') }}" class="btn btn-sm btn-outline-secondary">مسح</a>{% endif %}
+      <button type="submit" class="btn btn-sm btn-primary">
+        <i class="bi bi-search me-1"></i>بحث
+      </button>
+      {% if q or status %}
+      <a href="{{ url_for('web.companies_list') }}" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-x me-1"></i>مسح
+      </a>
+      {% endif %}
     </form>
   </div>
+
   <div class="table-responsive">
-    <table class="table table-hover mb-0">
+    <table class="data-table">
       <thead>
         <tr>
-          <th>اسم الشركة</th>
-          <th>رقم السجل</th>
+          <th>الشركة</th>
+          <th>رقم المنشأة</th>
           <th>المدينة</th>
           <th>الهاتف</th>
           <th>الحالة</th>
@@ -36,22 +47,45 @@
       <tbody>
         {% for c in companies %}
         <tr>
-          <td class="fw-600">{{ c.name }}</td>
-          <td><code>{{ c.companyNumber }}</code></td>
-          <td>{{ c.city or '-' }}</td>
-          <td>{{ c.phone or '-' }}</td>
-          <td><span class="status-badge badge-{{ c.status }}">{{ status_ar.get(c.status, c.status) }}</span></td>
+          <td>
+            <div style="display:flex;align-items:center;gap:.65rem;">
+              <div style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#06B6D4,#0891B2);
+                display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:.8rem;flex-shrink:0;">
+                {{ c.name[0] }}
+              </div>
+              <span style="font-weight:600;">{{ c.name }}</span>
+            </div>
+          </td>
+          <td><code>{{ c.companyNumber or '—' }}</code></td>
+          <td style="color:var(--text-2);">{{ c.city or '—' }}</td>
+          <td style="color:var(--text-2);">{{ c.phone or '—' }}</td>
+          <td>
+            <span class="sbadge sbadge-{{ c.status }}">
+              {{ {'active':'نشطة','suspended':'موقوفة'}.get(c.status, c.status) }}
+            </span>
+          </td>
           <td>
             <div class="d-flex gap-1">
-              <a href="{{ url_for('web.companies_edit', cid=c.id) }}" class="btn btn-sm btn-outline-primary" title="تعديل"><i class="bi bi-pencil"></i></a>
-              <form method="POST" action="{{ url_for('web.companies_delete', cid=c.id) }}" onsubmit="return confirm('هل تريد حذف هذه الشركة؟')">
-                <button class="btn btn-sm btn-outline-danger" title="حذف"><i class="bi bi-trash"></i></button>
+              <a href="{{ url_for('web.companies_edit', cid=c.id) }}"
+                 class="btn btn-icon btn-outline-primary" title="تعديل">
+                <i class="bi bi-pencil"></i>
+              </a>
+              <form method="POST" action="{{ url_for('web.companies_delete', cid=c.id) }}"
+                    onsubmit="return confirm('هل تريد حذف هذه الشركة؟')">
+                <button class="btn btn-icon btn-outline-danger" title="حذف">
+                  <i class="bi bi-trash"></i>
+                </button>
               </form>
             </div>
           </td>
         </tr>
         {% else %}
-        <tr><td colspan="6"><div class="empty-state"><i class="bi bi-building-slash"></i>لا توجد شركات</div></td></tr>
+        <tr><td colspan="6">
+          <div class="empty-state">
+            <i class="bi bi-building-slash"></i>
+            <p>لا توجد شركات{% if q or status %} تطابق البحث{% endif %}</p>
+          </div>
+        </td></tr>
         {% endfor %}
       </tbody>
     </table>
