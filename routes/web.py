@@ -107,16 +107,11 @@ def permits_new():
                            companies_json=json.dumps(companies, ensure_ascii=False, default=str))
 
 
-@web_bp.post('/permits/new')
-@login_required
-def permits_create():
-    f = request.form
-    u = current_user()
-    worker_mode = f.get('worker_mode', 'existing')
+def _resolve_worker(f, u):
+    """ينشئ / يحدّث / يعيد worker_id بحسب worker_mode."""
+    mode      = f.get('worker_mode', 'existing')
     worker_id = f.get('workerId') or None
-
-    # بيانات العامل المُدخَلة في النموذج
-    worker_fields = {
+    fields = {
         'fullName':       f.get('worker_fullName', '').strip(),
         'nationality':    f.get('worker_nationality', '').strip(),
         'idNumber':       f.get('worker_idNumber', '').strip(),
@@ -126,20 +121,50 @@ def permits_create():
         'email':          f.get('worker_email', '').strip(),
         'occupation':     f.get('worker_occupation', '').strip(),
     }
+    if mode == 'new' and fields.get('fullName'):
+        return db.create_worker(fields, u['id'])['id']
+    if worker_id and any(fields.values()):
+        db.update_worker(worker_id, fields, u['id'])
+    return worker_id
 
-    if worker_mode == 'new':
-        # إنشاء عامل جديد من البيانات المُدخَلة
-        new_worker = db.create_worker(worker_fields, u['id'])
-        worker_id = new_worker['id']
-    elif worker_id and any(worker_fields.values()):
-        # تحديث بيانات العامل المسجّل بما عدّله المستخدم
-        db.update_worker(worker_id, worker_fields, u['id'])
 
+def _resolve_company(f, prefix, u):
+    """ينشئ / يحدّث / يعيد company_id بحسب {prefix}_mode."""
+    mode       = f.get(f'{prefix}_mode', 'existing')
+    company_id = f.get(f'{prefix}CompanyId') or f.get('companyId') if prefix == 'provider' else f.get(f'{prefix}CompanyId')
+    # اقرأ الـ id من الحقول الصحيحة حسب prefix
+    if prefix == 'provider':
+        company_id = f.get('companyId') or None
+    else:
+        company_id = f.get('beneficiaryCompanyId') or None
+    fields = {
+        'name':          f.get(f'{prefix}_name', '').strip(),
+        'companyNumber': f.get(f'{prefix}_companyNumber', '').strip(),
+        'city':          f.get(f'{prefix}_city', '').strip(),
+        'phone':         f.get(f'{prefix}_phone', '').strip(),
+        'email':         f.get(f'{prefix}_email', '').strip(),
+        'address':       f.get(f'{prefix}_address', '').strip(),
+    }
+    if mode == 'new' and fields.get('name'):
+        return db.create_company(fields, u['id'])['id']
+    if company_id and any(fields.values()):
+        db.update_company(company_id, fields, u['id'])
+    return company_id
+
+
+@web_bp.post('/permits/new')
+@login_required
+def permits_create():
+    f = request.form
+    u = current_user()
+    worker_id   = _resolve_worker(f, u)
+    company_id  = _resolve_company(f, 'provider', u)
+    beneficiary_id = _resolve_company(f, 'beneficiary', u)
     data = {
         'permitNumber':         f.get('permitNumber') or None,
         'workerId':             worker_id,
-        'companyId':            f.get('companyId') or None,
-        'beneficiaryCompanyId': f.get('beneficiaryCompanyId') or None,
+        'companyId':            company_id,
+        'beneficiaryCompanyId': beneficiary_id,
         'occupation':           f.get('occupation', ''),
         'notes':                f.get('notes', ''),
         'workLocation':         f.get('workLocation', ''),
@@ -184,31 +209,14 @@ def permits_edit(pid):
 def permits_update(pid):
     f = request.form
     u = current_user()
-    worker_mode = f.get('worker_mode', 'existing')
-    worker_id   = f.get('workerId') or None
-
-    worker_fields = {
-        'fullName':       f.get('worker_fullName', '').strip(),
-        'nationality':    f.get('worker_nationality', '').strip(),
-        'idNumber':       f.get('worker_idNumber', '').strip(),
-        'passportNumber': f.get('worker_passportNumber', '').strip(),
-        'phone':          f.get('worker_phone', '').strip(),
-        'birthDate':      f.get('worker_birthDate', '').strip(),
-        'email':          f.get('worker_email', '').strip(),
-        'occupation':     f.get('worker_occupation', '').strip(),
-    }
-
-    if worker_mode == 'new':
-        new_worker = db.create_worker(worker_fields, u['id'])
-        worker_id  = new_worker['id']
-    elif worker_id and any(worker_fields.values()):
-        db.update_worker(worker_id, worker_fields, u['id'])
-
+    worker_id      = _resolve_worker(f, u)
+    company_id     = _resolve_company(f, 'provider', u)
+    beneficiary_id = _resolve_company(f, 'beneficiary', u)
     data = {
         'permitNumber':         f.get('permitNumber') or None,
         'workerId':             worker_id,
-        'companyId':            f.get('companyId') or None,
-        'beneficiaryCompanyId': f.get('beneficiaryCompanyId') or None,
+        'companyId':            company_id,
+        'beneficiaryCompanyId': beneficiary_id,
         'occupation':           f.get('occupation'),
         'notes':                f.get('notes'),
         'workLocation':         f.get('workLocation'),
