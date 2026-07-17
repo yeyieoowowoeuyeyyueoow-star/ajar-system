@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+.pythonlibs/
+*.egg-info/
+dist/
+build/
+.eggs/
+venv/
+.venv/
+env/
+
+# Node / Frontend
+node_modules/
+frontend/node_modules/
+frontend/dist/
+
+# Built frontend (Railway builds this fresh; don't commit)
+public/assets/
+
+# Replit
+.replit
+replit.nix
+.cache/
+.config/
+.local/
+.agents/
+.upm/
+
+# Env & secrets
+.env
+.env.*
+*.env
+
+# Misc
+*.zip
+*.log
+.DS_Store

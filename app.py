@@ -32,6 +32,11 @@ def create_app() -> Flask:
     app.register_blueprint(logs_bp,      url_prefix='/api/logs')
     app.register_blueprint(search_bp,    url_prefix='/api/search')
 
+    # ── Health check (Railway / load-balancer) ────────────────────────
+    @app.route('/api/health')
+    def health():
+        return jsonify({'status': 'ok'}), 200
+
     # ── Download project zip ──────────────────────────────────────────
     @app.route('/download/ajar_source.zip')
     def download_zip():
